@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parity Terminal</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="brand">PARITY <span>TERMINAL</span></div>
+    <div class="clock" id="clock">--:--:--</div>
+  </header>
+
+  <!-- API-Key-Eingabe: erscheint nur, solange kein Key im Browser gespeichert ist -->
+  <section id="setupPanel" class="setup-panel hidden">
+    <div class="setup-box">
+      <h2>Finnhub API-Key einrichten</h2>
+      <p>
+        Für Live-Kurse brauchst du einen kostenlosen API-Key von
+        <a href="https://finnhub.io/register" target="_blank" rel="noopener">finnhub.io</a>.
+        Der Key wird nur in deinem Browser gespeichert (localStorage), nicht im Code.
+      </p>
+      <input type="text" id="apiKeyInput" placeholder="API-Key einfügen...">
+      <button id="saveApiKey">Speichern</button>
+      <p class="error" id="setupError"></p>
+    </div>
+  </section>
+
+  <main id="app" class="hidden">
+
+    <section class="search-bar">
+      <input type="text" id="searchInput" placeholder="Aktie suchen (z.B. AAPL, SAP, Tesla)...">
+      <button id="searchBtn">Suchen</button>
+      <div id="searchResults" class="search-results"></div>
+    </section>
+
+    <section class="watchlist-section">
+      <div class="section-header">
+        <h2>Watchlist</h2>
+        <div>
+          <span id="lastUpdate" class="last-update"></span>
+          <button id="refreshBtn">Aktualisieren</button>
+        </div>
+      </div>
+
+      <table class="ticker-table">
+        <thead>
+          <tr>
+            <th>Symbol</th>
+            <th>Kurs</th>
+            <th>Änderung</th>
+            <th>Änderung %</th>
+            <th>Eröffnung</th>
+            <th>Tageshoch</th>
+            <th>Tagestief</th>
+            <th>Vortagesschluss</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="watchlistBody">
+          <!-- wird per JS gefüllt -->
+        </tbody>
+      </table>
+
+      <p id="emptyState" class="empty-state hidden">
+        Noch keine Aktien in der Watchlist. Oben nach einer Aktie suchen und hinzufügen.
+      </p>
+    </section>
+
+    <footer class="settings-footer">
+      <button id="resetKeyBtn">API-Key zurücksetzen</button>
+    </footer>
+
+  </main>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

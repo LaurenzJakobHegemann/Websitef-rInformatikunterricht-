@@ -1,0 +1,271 @@
+:root {
+  --bg: #0a0e12;
+  --panel: #10161c;
+  --border: #1f2a33;
+  --text: #d7e4ea;
+  --muted: #6b7d8a;
+  --accent: #ff8c00;
+  --green: #2ecc71;
+  --red: #ff4d4d;
+  font-size: 15px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Courier New", Consolas, monospace;
+  min-height: 100vh;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+}
+
+.brand {
+  font-size: 1.3rem;
+  letter-spacing: 2px;
+  font-weight: bold;
+}
+
+.brand span {
+  color: var(--accent);
+}
+
+.clock {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Setup panel */
+.setup-panel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  padding: 24px;
+}
+
+.setup-box {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 28px;
+  max-width: 420px;
+  text-align: center;
+}
+
+.setup-box h2 {
+  margin-top: 0;
+  color: var(--accent);
+}
+
+.setup-box a {
+  color: var(--accent);
+}
+
+.setup-box input {
+  width: 100%;
+  padding: 10px;
+  margin: 14px 0 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 4px;
+  font-family: inherit;
+}
+
+.setup-box button {
+  width: 100%;
+  padding: 10px;
+}
+
+.error {
+  color: var(--red);
+  min-height: 1.2em;
+  font-size: 0.85rem;
+}
+
+/* Main app */
+main {
+  padding: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.search-bar {
+  position: relative;
+  display: flex;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+.search-bar input {
+  flex: 1;
+  padding: 10px 12px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 4px;
+  font-family: inherit;
+}
+
+button {
+  padding: 10px 16px;
+  background: var(--accent);
+  color: #0a0e12;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+button:hover {
+  filter: brightness(1.1);
+}
+
+button.secondary {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.search-results {
+  position: absolute;
+  top: 46px;
+  left: 0;
+  right: 0;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  max-height: 260px;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+.search-results:empty {
+  display: none;
+}
+
+.search-result-item {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+}
+
+.search-result-item:last-child {
+  border-bottom: none;
+}
+
+.search-result-item:hover {
+  background: var(--bg);
+}
+
+.search-result-item .symbol {
+  color: var(--accent);
+  font-weight: bold;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.section-header h2 {
+  margin: 0;
+}
+
+.last-update {
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-right: 12px;
+}
+
+.ticker-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--panel);
+  border: 1px solid var(--border);
+}
+
+.ticker-table th,
+.ticker-table td {
+  padding: 10px 12px;
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+}
+
+.ticker-table th:first-child,
+.ticker-table td:first-child {
+  text-align: left;
+}
+
+.ticker-table th {
+  color: var(--muted);
+  font-weight: normal;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.ticker-table td.symbol {
+  font-weight: bold;
+}
+
+.up {
+  color: var(--green);
+}
+
+.down {
+  color: var(--red);
+}
+
+.remove-btn {
+  background: transparent;
+  color: var(--muted);
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 2px 8px;
+}
+
+.remove-btn:hover {
+  color: var(--red);
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--muted);
+  padding: 30px;
+  border: 1px dashed var(--border);
+  margin-top: 12px;
+}
+
+.settings-footer {
+  margin-top: 40px;
+  text-align: center;
+}
+
+.settings-footer button {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  font-size: 0.8rem;
+}
