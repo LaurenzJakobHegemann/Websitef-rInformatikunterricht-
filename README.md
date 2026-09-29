@@ -8,6 +8,8 @@ Aktien-Watchlist mit aktuellen Tageskursen.
 - Suche nach Aktien (Symbol oder Firmenname)
 - Watchlist mit Live-Kursen (Kurs, Änderung, Änderung %, Eröffnung, Tageshoch/-tief, Vortagesschluss)
 - Automatische Aktualisierung alle 15 Sekunden
+- Klick auf eine Aktie öffnet ein Firmenprofil: Branche, Land, Marktkapitalisierung, IPO-Datum,
+  Management/CEO (falls im Finnhub-Plan verfügbar) und ein 1-Jahres-Kurschart mit Hover-Tooltip
 - Kein Server nötig – reine HTML/CSS/JS-Seite
 
 ## Setup
@@ -43,3 +45,7 @@ js/app.js        Logik: Aktien-Suche, Watchlist, Kursabruf über Finnhub-API
 
 Es wird die kostenlose [Finnhub](https://finnhub.io/)-API verwendet. Der kostenlose Plan hat ein
 Rate-Limit (60 Anfragen/Minute), das für eine private Watchlist mit einigen Aktien ausreicht.
+
+Zwei Endpunkte im Firmenprofil (Management/CEO über `/stock/executive` und historische Kurse über
+`/stock/candle`) sind bei Finnhub für manche Symbole nur im bezahlten Plan enthalten. Die Seite fängt
+das ab und zeigt dann einen Hinweistext statt eines Fehlers an.

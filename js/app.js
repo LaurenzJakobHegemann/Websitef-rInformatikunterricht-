@@ -21,6 +21,10 @@ const watchlistBody = document.getElementById("watchlistBody");
 const emptyState = document.getElementById("emptyState");
 const clockEl = document.getElementById("clock");
 
+const detailModal = document.getElementById("detailModal");
+const detailContent = document.getElementById("detailContent");
+const closeModalBtn = document.getElementById("closeModalBtn");
+
 let apiKey = localStorage.getItem(API_KEY_STORAGE) || "";
 let watchlist = loadWatchlist();
 let refreshTimer = null;
@@ -72,6 +76,14 @@ function init() {
   });
 
   refreshBtn.addEventListener("click", refreshWatchlist);
+
+  closeModalBtn.addEventListener("click", closeDetail);
+  detailModal.addEventListener("click", (e) => {
+    if (e.target === detailModal) closeDetail();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeDetail();
+  });
 }
 
 function updateClock() {
@@ -198,7 +210,11 @@ function renderWatchlist() {
       <td data-field="prevClose">-</td>
       <td><button class="remove-btn" title="Entfernen">&times;</button></td>
     `;
-    row.querySelector(".remove-btn").addEventListener("click", () => removeFromWatchlist(symbol));
+    row.querySelector(".remove-btn").addEventListener("click", (e) => {
+      e.stopPropagation();
+      removeFromWatchlist(symbol);
+    });
+    row.addEventListener("click", () => openDetail(symbol));
     watchlistBody.appendChild(row);
   });
 }
@@ -246,6 +262,248 @@ function setChangeCell(el, text, cls) {
 function formatNumber(n) {
   if (typeof n !== "number" || Number.isNaN(n)) return "-";
   return n.toFixed(2);
+}
+
+/* ---------- Firmenprofil-Modal ---------- */
+
+async function fetchProfile(symbol) {
+  const res = await fetch(
+    `https://finnhub.io/api/v1/stock/profile2?symbol=${encodeURIComponent(symbol)}&token=${encodeURIComponent(apiKey)}`
+  );
+  if (!res.ok) throw new Error("Profil fehlgeschlagen");
+  const data = await res.json();
+  if (!data || !data.name) throw new Error("Kein Profil verfügbar");
+  return data;
+}
+
+async function fetchExecutives(symbol) {
+  const res = await fetch(
+    `https://finnhub.io/api/v1/stock/executive?symbol=${encodeURIComponent(symbol)}&token=${encodeURIComponent(apiKey)}`
+  );
+  if (!res.ok) throw new Error("Executives nicht verfügbar (evtl. nur im bezahlten Plan)");
+  const data = await res.json();
+  if (!data || !Array.isArray(data.executive) || data.executive.length === 0) {
+    throw new Error("Keine Management-Daten verfügbar");
+  }
+  return data.executive;
+}
+
+async function fetchCandles(symbol) {
+  const to = Math.floor(Date.now() / 1000);
+  const from = to - 365 * 24 * 60 * 60;
+  const res = await fetch(
+    `https://finnhub.io/api/v1/stock/candle?symbol=${encodeURIComponent(symbol)}&resolution=W&from=${from}&to=${to}&token=${encodeURIComponent(apiKey)}`
+  );
+  if (!res.ok) throw new Error("Historische Kurse nicht verfügbar (evtl. nur im bezahlten Plan)");
+  const data = await res.json();
+  if (!data || data.s !== "ok" || !Array.isArray(data.c) || data.c.length < 2) {
+    throw new Error("Keine historischen Kurse für dieses Symbol");
+  }
+  return data;
+}
+
+function formatMarketCap(millions) {
+  if (typeof millions !== "number" || Number.isNaN(millions)) return "-";
+  if (millions >= 1_000_000) return `${(millions / 1_000_000).toFixed(2)} Bio. USD`;
+  if (millions >= 1_000) return `${(millions / 1_000).toFixed(2)} Mrd. USD`;
+  return `${millions.toFixed(0)} Mio. USD`;
+}
+
+async function openDetail(symbol) {
+  detailModal.classList.remove("hidden");
+  detailContent.innerHTML = `<p class="detail-loading">Lade Firmendaten für ${symbol}...</p>`;
+
+  const [profileResult, execResult, candleResult] = await Promise.allSettled([
+    fetchProfile(symbol),
+    fetchExecutives(symbol),
+    fetchCandles(symbol),
+  ]);
+
+  if (profileResult.status === "rejected") {
+    detailContent.innerHTML = `<p class="detail-error">Firmenprofil für ${symbol} konnte nicht geladen werden.</p>`;
+    return;
+  }
+
+  renderDetail(
+    symbol,
+    profileResult.value,
+    execResult.status === "fulfilled" ? execResult.value : null,
+    candleResult.status === "fulfilled" ? candleResult.value : null
+  );
+}
+
+function closeDetail() {
+  detailModal.classList.add("hidden");
+  detailContent.innerHTML = "";
+}
+
+function renderDetail(symbol, profile, executives, candles) {
+  const logo = profile.logo
+    ? `<img src="${profile.logo}" alt="${profile.name} Logo" onerror="this.remove()">`
+    : "";
+
+  detailContent.innerHTML = `
+    <div class="detail-header">
+      ${logo}
+      <div>
+        <h2>${profile.name}</h2>
+        <div class="ticker-sub">${symbol} &middot; ${profile.exchange || "-"}</div>
+      </div>
+    </div>
+
+    <div class="detail-grid">
+      <div class="detail-field">
+        <span class="label">Branche</span>
+        <span class="value">${profile.finnhubIndustry || "-"}</span>
+      </div>
+      <div class="detail-field">
+        <span class="label">Land</span>
+        <span class="value">${profile.country || "-"}</span>
+      </div>
+      <div class="detail-field">
+        <span class="label">Marktkapitalisierung</span>
+        <span class="value">${formatMarketCap(profile.marketCapitalization)}</span>
+      </div>
+      <div class="detail-field">
+        <span class="label">Börsengang (IPO)</span>
+        <span class="value">${profile.ipo || "-"}</span>
+      </div>
+      <div class="detail-field">
+        <span class="label">Ausstehende Aktien</span>
+        <span class="value">${profile.shareOutstanding ? profile.shareOutstanding.toFixed(1) + " Mio." : "-"}</span>
+      </div>
+      <div class="detail-field">
+        <span class="label">Website</span>
+        <span class="value">
+          ${profile.weburl ? `<a class="website-link" href="${profile.weburl}" target="_blank" rel="noopener">${profile.weburl}</a>` : "-"}
+        </span>
+      </div>
+    </div>
+
+    <div class="detail-section-title">Management</div>
+    <div id="execSection">
+      ${
+        executives
+          ? `<ul class="exec-list">${executives
+              .slice(0, 6)
+              .map((e) => `<li><span>${e.name}</span><span class="exec-title">${e.title || ""}</span></li>`)
+              .join("")}</ul>`
+          : `<p class="data-note">Management-Daten sind für dieses Symbol nicht verfügbar (bei Finnhub teils nur im bezahlten Plan enthalten).</p>`
+      }
+    </div>
+
+    <div class="detail-section-title">Kursverlauf (1 Jahr)</div>
+    <div id="chartSection" class="chart-wrap">
+      ${candles ? "" : `<p class="data-note">Historischer Kursverlauf für dieses Symbol nicht verfügbar (bei Finnhub teils nur im bezahlten Plan enthalten).</p>`}
+    </div>
+  `;
+
+  if (candles) {
+    renderPriceChart(document.getElementById("chartSection"), candles);
+  }
+}
+
+function renderPriceChart(container, candles) {
+  const width = 600;
+  const height = 200;
+  const padTop = 10;
+  const padBottom = 24;
+  const padSide = 4;
+
+  const prices = candles.c;
+  const times = candles.t;
+  const min = Math.min(...prices);
+  const max = Math.max(...prices);
+  const range = max - min || 1;
+
+  const xFor = (i) => padSide + (i / (prices.length - 1)) * (width - padSide * 2);
+  const yFor = (p) => padTop + (1 - (p - min) / range) * (height - padTop - padBottom);
+
+  const linePoints = prices.map((p, i) => `${xFor(i)},${yFor(p)}`).join(" ");
+  const areaPoints = `${padSide},${height - padBottom} ${linePoints} ${width - padSide},${height - padBottom}`;
+
+  const isUp = prices[prices.length - 1] >= prices[0];
+  const lineColor = isUp ? "var(--green)" : "var(--red)";
+
+  const tickCount = 5;
+  const tickLabels = [];
+  for (let i = 0; i < tickCount; i++) {
+    const idx = Math.round((i / (tickCount - 1)) * (times.length - 1));
+    const date = new Date(times[idx] * 1000);
+    tickLabels.push({ x: xFor(idx), label: date.toLocaleDateString("de-DE", { month: "short", year: "2-digit" }) });
+  }
+
+  container.innerHTML = `
+    <svg viewBox="0 0 ${width} ${height}" id="priceChartSvg">
+      <defs>
+        <linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" style="stop-color:${lineColor}; stop-opacity:0.28" />
+          <stop offset="100%" style="stop-color:${lineColor}; stop-opacity:0" />
+        </linearGradient>
+      </defs>
+      <line x1="${padSide}" y1="${padTop}" x2="${width - padSide}" y2="${padTop}" style="stroke:var(--border); stroke-width:1" />
+      <line x1="${padSide}" y1="${(height - padBottom + padTop) / 2}" x2="${width - padSide}" y2="${(height - padBottom + padTop) / 2}" style="stroke:var(--border); stroke-width:1" />
+      <line x1="${padSide}" y1="${height - padBottom}" x2="${width - padSide}" y2="${height - padBottom}" style="stroke:var(--border); stroke-width:1" />
+      <polygon points="${areaPoints}" fill="url(#areaFill)" stroke="none" />
+      <polyline points="${linePoints}" fill="none" style="stroke:${lineColor}; stroke-width:2; stroke-linecap:round; stroke-linejoin:round" />
+      ${tickLabels
+        .map((t) => `<text x="${t.x}" y="${height - 6}" font-size="9" style="fill:var(--muted)" text-anchor="middle">${t.label}</text>`)
+        .join("")}
+      <text x="${padSide}" y="${padTop + 8}" font-size="9" style="fill:var(--muted)">${formatNumber(max)}</text>
+      <text x="${padSide}" y="${height - padBottom - 4}" font-size="9" style="fill:var(--muted)">${formatNumber(min)}</text>
+      <line class="chart-crosshair-line" id="crosshairLine" x1="0" y1="${padTop}" x2="0" y2="${height - padBottom}" />
+      <circle id="crosshairDot" r="3.5" style="fill:${lineColor}" opacity="0" />
+      <rect x="0" y="0" width="${width}" height="${height}" fill="transparent" id="chartOverlay" style="cursor: crosshair;" />
+    </svg>
+    <div class="chart-tooltip" id="chartTooltip"></div>
+  `;
+
+  const svg = container.querySelector("#priceChartSvg");
+  const overlay = container.querySelector("#chartOverlay");
+  const crosshairLine = container.querySelector("#crosshairLine");
+  const crosshairDot = container.querySelector("#crosshairDot");
+  const tooltip = container.querySelector("#chartTooltip");
+
+  function handleMove(clientX) {
+    const rect = svg.getBoundingClientRect();
+    const relX = ((clientX - rect.left) / rect.width) * width;
+    const idx = Math.max(
+      0,
+      Math.min(prices.length - 1, Math.round(((relX - padSide) / (width - padSide * 2)) * (prices.length - 1)))
+    );
+    const px = xFor(idx);
+    const py = yFor(prices[idx]);
+
+    crosshairLine.setAttribute("x1", px);
+    crosshairLine.setAttribute("x2", px);
+    crosshairLine.style.opacity = 1;
+    crosshairDot.setAttribute("cx", px);
+    crosshairDot.setAttribute("cy", py);
+    crosshairDot.style.opacity = 1;
+
+    const date = new Date(times[idx] * 1000).toLocaleDateString("de-DE", { day: "2-digit", month: "short", year: "numeric" });
+    tooltip.textContent = `${date}: ${formatNumber(prices[idx])} USD`;
+    tooltip.style.left = `${(px / width) * 100}%`;
+    tooltip.style.top = `${(py / height) * 100}%`;
+    tooltip.style.opacity = 1;
+  }
+
+  function handleLeave() {
+    crosshairLine.style.opacity = 0;
+    crosshairDot.style.opacity = 0;
+    tooltip.style.opacity = 0;
+  }
+
+  overlay.addEventListener("mousemove", (e) => handleMove(e.clientX));
+  overlay.addEventListener("mouseleave", handleLeave);
+  overlay.addEventListener(
+    "touchmove",
+    (e) => {
+      if (e.touches[0]) handleMove(e.touches[0].clientX);
+    },
+    { passive: true }
+  );
+  overlay.addEventListener("touchend", handleLeave);
 }
 
 init();
