@@ -10,6 +10,9 @@ Aktien-Watchlist mit aktuellen Tageskursen.
 - Automatische Aktualisierung alle 15 Sekunden
 - Klick auf eine Aktie öffnet ein Firmenprofil: Branche, Land, Marktkapitalisierung, IPO-Datum,
   Management/CEO (falls im Finnhub-Plan verfügbar) und ein 1-Jahres-Kurschart mit Hover-Tooltip
+- Finanzkennzahlen im Firmenprofil: KGV, KUV, KBV, EV/EBITDA, EV/Umsatz, EBITDA-/Brutto-/operative/
+  Nettomarge, ROE, Umsatz, EBITDA, Nettogewinn, EPS, Umsatzwachstum und Dividendenrendite.
+  Umsatz, EBITDA und Nettogewinn werden aus den Pro-Aktie-Werten × ausstehende Aktien berechnet.
 - Kein Server nötig – reine HTML/CSS/JS-Seite
 
 ## Setup

@@ -302,21 +302,124 @@ async function fetchCandles(symbol) {
   return data;
 }
 
-function formatMarketCap(millions) {
-  if (typeof millions !== "number" || Number.isNaN(millions)) return "-";
-  if (millions >= 1_000_000) return `${(millions / 1_000_000).toFixed(2)} Bio. USD`;
-  if (millions >= 1_000) return `${(millions / 1_000).toFixed(2)} Mrd. USD`;
-  return `${millions.toFixed(0)} Mio. USD`;
+async function fetchMetrics(symbol) {
+  const res = await fetch(
+    `https://finnhub.io/api/v1/stock/metric?symbol=${encodeURIComponent(symbol)}&metric=all&token=${encodeURIComponent(apiKey)}`
+  );
+  if (!res.ok) throw new Error("Kennzahlen nicht verfügbar");
+  const data = await res.json();
+  if (!data || !data.metric || Object.keys(data.metric).length === 0) {
+    throw new Error("Keine Kennzahlen für dieses Symbol");
+  }
+  return data.metric;
+}
+
+function formatUsdMillions(millions) {
+  if (typeof millions !== "number" || !Number.isFinite(millions)) return "-";
+  const sign = millions < 0 ? "-" : "";
+  const abs = Math.abs(millions);
+  if (abs >= 1_000_000) return `${sign}${(abs / 1_000_000).toFixed(2)} Bio. USD`;
+  if (abs >= 1_000) return `${sign}${(abs / 1_000).toFixed(2)} Mrd. USD`;
+  return `${sign}${abs.toFixed(0)} Mio. USD`;
+}
+
+function formatMultiple(v) {
+  if (v === null) return "-";
+  if (v < 0) return "neg.";
+  return `${v.toFixed(1)}x`;
+}
+
+function formatPercent(v) {
+  if (v === null) return "-";
+  return `${v.toFixed(Math.abs(v) < 1 ? 2 : 1)} %`;
+}
+
+// Finnhub-Feldnamen variieren je nach Symbol; der erste vorhandene Wert gewinnt.
+function pick(metric, keys) {
+  for (const key of keys) {
+    const v = metric[key];
+    if (typeof v === "number" && Number.isFinite(v)) return v;
+  }
+  return null;
+}
+
+// Beträge in Mio. USD: Finnhub liefert shareOutstanding in Mio. Stück, *PerShare-Werte in USD.
+function buildFinancials(metric, profile) {
+  const shares = typeof profile.shareOutstanding === "number" ? profile.shareOutstanding : null;
+  const perShareTotal = (v) => (v !== null && shares ? v * shares : null);
+
+  const revenue = perShareTotal(pick(metric, ["revenuePerShareTTM", "revenuePerShareAnnual"]));
+  const ebitda = perShareTotal(pick(metric, ["ebitdPerShareTTM", "ebitdPerShareAnnual"]));
+  const eps = pick(metric, ["epsTTM", "epsInclExtraItemsTTM", "epsBasicExclExtraItemsTTM", "epsAnnual"]);
+  const netIncome = perShareTotal(eps);
+  const ev = pick(metric, ["enterpriseValue"]);
+
+  const evEbitdaReported = pick(metric, ["evEbitdaTTM", "ev/ebitdaTTM", "currentEv/ebitdaTTM"]);
+  const evRevenueReported = pick(metric, ["evRevenueTTM", "ev/revenueTTM", "currentEv/revenueTTM"]);
+
+  return {
+    valuation: [
+      { label: "KGV (P/E)", value: formatMultiple(pick(metric, ["peTTM", "peBasicExclExtraTTM", "peNormalizedAnnual", "peAnnual"])), hint: "Kurs / Gewinn je Aktie" },
+      { label: "KUV (P/S)", value: formatMultiple(pick(metric, ["psTTM", "psAnnual"])), hint: "Börsenwert / Umsatz" },
+      { label: "KBV (P/B)", value: formatMultiple(pick(metric, ["pbQuarterly", "pbAnnual", "pb"])), hint: "Kurs / Buchwert je Aktie" },
+      {
+        label: "EV / EBITDA",
+        value: formatMultiple(evEbitdaReported ?? (ev !== null && ebitda > 0 ? ev / ebitda : null)),
+        hint: evEbitdaReported === null ? "berechnet" : "Unternehmenswert / EBITDA",
+      },
+      {
+        label: "EV / Umsatz",
+        value: formatMultiple(evRevenueReported ?? (ev !== null && revenue > 0 ? ev / revenue : null)),
+        hint: evRevenueReported === null ? "berechnet" : "Unternehmenswert / Umsatz",
+      },
+    ],
+    profitability: [
+      { label: "EBITDA-Marge", value: formatPercent(ebitda !== null && revenue > 0 ? (ebitda / revenue) * 100 : null), hint: "berechnet" },
+      { label: "Bruttomarge", value: formatPercent(pick(metric, ["grossMarginTTM", "grossMarginAnnual"])), hint: "TTM" },
+      { label: "Operative Marge", value: formatPercent(pick(metric, ["operatingMarginTTM", "operatingMarginAnnual"])), hint: "TTM" },
+      { label: "Nettomarge", value: formatPercent(pick(metric, ["netProfitMarginTTM", "netProfitMarginAnnual"])), hint: "TTM" },
+      { label: "Eigenkapitalrendite", value: formatPercent(pick(metric, ["roeTTM", "roeRfy"])), hint: "ROE, TTM" },
+    ],
+    absolute: [
+      { label: "Umsatz", value: formatUsdMillions(revenue), hint: "TTM, berechnet" },
+      { label: "EBITDA", value: formatUsdMillions(ebitda), hint: "TTM, berechnet" },
+      { label: "Nettogewinn", value: formatUsdMillions(netIncome), hint: "TTM, berechnet" },
+      { label: "Gewinn je Aktie", value: eps === null ? "-" : `${eps.toFixed(2)} USD`, hint: "EPS, TTM" },
+      { label: "Umsatzwachstum", value: formatPercent(pick(metric, ["revenueGrowthTTMYoy", "revenueGrowthQuarterlyYoy"])), hint: "ggü. Vorjahr" },
+      { label: "Dividendenrendite", value: formatPercent(pick(metric, ["dividendYieldIndicatedAnnual", "currentDividendYieldTTM"])), hint: "p.a." },
+    ],
+  };
+}
+
+function renderMetricGroup(title, items) {
+  return `
+    <div class="metric-group">
+      <div class="metric-group-title">${title}</div>
+      <div class="metric-grid">
+        ${items
+          .map(
+            (i) => `
+          <div class="metric-tile">
+            <span class="label">${i.label}</span>
+            <span class="value">${i.value}</span>
+            <span class="metric-hint">${i.hint}</span>
+          </div>`
+          )
+          .join("")}
+      </div>
+    </div>
+  `;
 }
 
 async function openDetail(symbol) {
   detailModal.classList.remove("hidden");
   detailContent.innerHTML = `<p class="detail-loading">Lade Firmendaten für ${symbol}...</p>`;
 
-  const [profileResult, execResult, candleResult] = await Promise.allSettled([
+  const [profileResult, execResult, candleResult, metricResult] = await Promise.allSettled([
     fetchProfile(symbol),
     fetchExecutives(symbol),
     fetchCandles(symbol),
+    fetchMetrics(symbol),
   ]);
 
   if (profileResult.status === "rejected") {
@@ -328,7 +431,8 @@ async function openDetail(symbol) {
     symbol,
     profileResult.value,
     execResult.status === "fulfilled" ? execResult.value : null,
-    candleResult.status === "fulfilled" ? candleResult.value : null
+    candleResult.status === "fulfilled" ? candleResult.value : null,
+    metricResult.status === "fulfilled" ? metricResult.value : null
   );
 }
 
@@ -337,10 +441,19 @@ function closeDetail() {
   detailContent.innerHTML = "";
 }
 
-function renderDetail(symbol, profile, executives, candles) {
+function renderDetail(symbol, profile, executives, candles, metrics) {
   const logo = profile.logo
     ? `<img src="${profile.logo}" alt="${profile.name} Logo" onerror="this.remove()">`
     : "";
+
+  let financialsHtml = `<p class="data-note">Finanzkennzahlen für dieses Symbol nicht verfügbar.</p>`;
+  if (metrics) {
+    const f = buildFinancials(metrics, profile);
+    financialsHtml =
+      renderMetricGroup("Bewertung (Multiples)", f.valuation) +
+      renderMetricGroup("Profitabilität", f.profitability) +
+      renderMetricGroup("Umsatz &amp; Gewinn", f.absolute);
+  }
 
   detailContent.innerHTML = `
     <div class="detail-header">
@@ -362,7 +475,7 @@ function renderDetail(symbol, profile, executives, candles) {
       </div>
       <div class="detail-field">
         <span class="label">Marktkapitalisierung</span>
-        <span class="value">${formatMarketCap(profile.marketCapitalization)}</span>
+        <span class="value">${formatUsdMillions(profile.marketCapitalization)}</span>
       </div>
       <div class="detail-field">
         <span class="label">Börsengang (IPO)</span>
@@ -379,6 +492,9 @@ function renderDetail(symbol, profile, executives, candles) {
         </span>
       </div>
     </div>
+
+    <div class="detail-section-title">Finanzkennzahlen</div>
+    ${financialsHtml}
 
     <div class="detail-section-title">Management</div>
     <div id="execSection">
