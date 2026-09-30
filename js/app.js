@@ -125,6 +125,7 @@ function startApp() {
   app.classList.remove("hidden");
   renderWatchlist();
   refreshWatchlist();
+  refreshEarnings();
 
   if (refreshTimer) clearInterval(refreshTimer);
   refreshTimer = setInterval(refreshWatchlist, REFRESH_INTERVAL_MS);
@@ -169,7 +170,7 @@ function renderSearchResults(results) {
   results.slice(0, 15).forEach((r) => {
     const item = document.createElement("div");
     item.className = "search-result-item";
-    item.innerHTML = `<span class="symbol">${r.symbol}</span><span>${r.description || ""}</span>`;
+    item.innerHTML = `<span class="symbol">${escapeHtml(r.symbol)}</span><span>${escapeHtml(r.description || "")}</span>`;
     item.addEventListener("click", () => addToWatchlist(r.symbol));
     searchResults.appendChild(item);
   });
@@ -181,6 +182,7 @@ function addToWatchlist(symbol) {
     saveWatchlist();
     renderWatchlist();
     refreshWatchlist();
+    refreshEarnings();
   }
   searchResults.innerHTML = "";
   searchInput.value = "";
@@ -190,6 +192,7 @@ function removeFromWatchlist(symbol) {
   watchlist = watchlist.filter((s) => s !== symbol);
   saveWatchlist();
   renderWatchlist();
+  renderEarnings();
 }
 
 function renderWatchlist() {
@@ -411,40 +414,49 @@ function renderMetricGroup(title, items) {
   `;
 }
 
-async function openDetail(symbol) {
-  detailModal.classList.remove("hidden");
-  detailContent.innerHTML = `<p class="detail-loading">Lade Firmendaten für ${symbol}...</p>`;
+// Verhindert, dass eine langsame Antwort ein inzwischen geöffnetes anderes Profil überschreibt.
+let detailRequestId = 0;
 
-  const [profileResult, execResult, candleResult, metricResult] = await Promise.allSettled([
+async function openDetail(symbol) {
+  const requestId = ++detailRequestId;
+  const isCurrent = () => requestId === detailRequestId;
+
+  detailModal.classList.remove("hidden");
+  detailContent.innerHTML = `<p class="detail-loading">Lade Firmendaten für ${escapeHtml(symbol)}...</p>`;
+
+  const results = await Promise.allSettled([
     fetchProfile(symbol),
     fetchExecutives(symbol),
     fetchCandles(symbol),
     fetchMetrics(symbol),
+    fetchCompanyNews(symbol),
+    fetchRecommendation(symbol),
   ]);
+  if (!isCurrent()) return;
 
-  if (profileResult.status === "rejected") {
-    detailContent.innerHTML = `<p class="detail-error">Firmenprofil für ${symbol} konnte nicht geladen werden.</p>`;
+  const [profile, executives, candles, metrics, news, recommendation] = results.map((r) =>
+    r.status === "fulfilled" ? r.value : null
+  );
+
+  if (!profile) {
+    detailContent.innerHTML = `<p class="detail-error">Firmenprofil für ${escapeHtml(symbol)} konnte nicht geladen werden.</p>`;
     return;
   }
 
-  renderDetail(
-    symbol,
-    profileResult.value,
-    execResult.status === "fulfilled" ? execResult.value : null,
-    candleResult.status === "fulfilled" ? candleResult.value : null,
-    metricResult.status === "fulfilled" ? metricResult.value : null
-  );
+  renderDetail(symbol, { profile, executives, candles, metrics, news, recommendation });
+  loadPeerComparison(symbol, metrics, document.getElementById("peerSection"), isCurrent);
 }
 
 function closeDetail() {
+  detailRequestId++;
   detailModal.classList.add("hidden");
   detailContent.innerHTML = "";
 }
 
-function renderDetail(symbol, profile, executives, candles, metrics) {
-  const logo = profile.logo
-    ? `<img src="${profile.logo}" alt="${profile.name} Logo" onerror="this.remove()">`
-    : "";
+function renderDetail(symbol, { profile, executives, candles, metrics, news, recommendation }) {
+  const logoUrl = safeUrl(profile.logo);
+  const logo = logoUrl ? `<img src="${escapeHtml(logoUrl)}" alt="" onerror="this.remove()">` : "";
+  const webUrl = safeUrl(profile.weburl);
 
   let financialsHtml = `<p class="data-note">Finanzkennzahlen für dieses Symbol nicht verfügbar.</p>`;
   if (metrics) {
@@ -459,19 +471,19 @@ function renderDetail(symbol, profile, executives, candles, metrics) {
     <div class="detail-header">
       ${logo}
       <div>
-        <h2>${profile.name}</h2>
-        <div class="ticker-sub">${symbol} &middot; ${profile.exchange || "-"}</div>
+        <h2>${escapeHtml(profile.name)}</h2>
+        <div class="ticker-sub">${escapeHtml(symbol)} &middot; ${escapeHtml(profile.exchange || "-")}</div>
       </div>
     </div>
 
     <div class="detail-grid">
       <div class="detail-field">
         <span class="label">Branche</span>
-        <span class="value">${profile.finnhubIndustry || "-"}</span>
+        <span class="value">${escapeHtml(profile.finnhubIndustry || "-")}</span>
       </div>
       <div class="detail-field">
         <span class="label">Land</span>
-        <span class="value">${profile.country || "-"}</span>
+        <span class="value">${escapeHtml(profile.country || "-")}</span>
       </div>
       <div class="detail-field">
         <span class="label">Marktkapitalisierung</span>
@@ -479,7 +491,7 @@ function renderDetail(symbol, profile, executives, candles, metrics) {
       </div>
       <div class="detail-field">
         <span class="label">Börsengang (IPO)</span>
-        <span class="value">${profile.ipo || "-"}</span>
+        <span class="value">${escapeHtml(profile.ipo || "-")}</span>
       </div>
       <div class="detail-field">
         <span class="label">Ausstehende Aktien</span>
@@ -488,13 +500,27 @@ function renderDetail(symbol, profile, executives, candles, metrics) {
       <div class="detail-field">
         <span class="label">Website</span>
         <span class="value">
-          ${profile.weburl ? `<a class="website-link" href="${profile.weburl}" target="_blank" rel="noopener">${profile.weburl}</a>` : "-"}
+          ${webUrl ? `<a class="website-link" href="${escapeHtml(webUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(webUrl)}</a>` : "-"}
         </span>
       </div>
     </div>
 
+    <div class="detail-section-title">Kursverlauf (1 Jahr)</div>
+    <div id="chartSection" class="chart-wrap">
+      ${candles ? "" : `<p class="data-note">Historischer Kursverlauf für dieses Symbol nicht verfügbar (bei Finnhub teils nur im bezahlten Plan enthalten).</p>`}
+    </div>
+
+    <div class="detail-section-title">Analysten-Einschätzungen</div>
+    ${renderRecommendation(recommendation)}
+
     <div class="detail-section-title">Finanzkennzahlen</div>
     ${financialsHtml}
+
+    <div class="detail-section-title">Vergleich mit Konkurrenten</div>
+    <div id="peerSection"></div>
+
+    <div class="detail-section-title">Aktuelle Nachrichten</div>
+    ${renderNews(news)}
 
     <div class="detail-section-title">Management</div>
     <div id="execSection">
@@ -502,15 +528,10 @@ function renderDetail(symbol, profile, executives, candles, metrics) {
         executives
           ? `<ul class="exec-list">${executives
               .slice(0, 6)
-              .map((e) => `<li><span>${e.name}</span><span class="exec-title">${e.title || ""}</span></li>`)
+              .map((e) => `<li><span>${escapeHtml(e.name)}</span><span class="exec-title">${escapeHtml(e.title || "")}</span></li>`)
               .join("")}</ul>`
           : `<p class="data-note">Management-Daten sind für dieses Symbol nicht verfügbar (bei Finnhub teils nur im bezahlten Plan enthalten).</p>`
       }
-    </div>
-
-    <div class="detail-section-title">Kursverlauf (1 Jahr)</div>
-    <div id="chartSection" class="chart-wrap">
-      ${candles ? "" : `<p class="data-note">Historischer Kursverlauf für dieses Symbol nicht verfügbar (bei Finnhub teils nur im bezahlten Plan enthalten).</p>`}
     </div>
   `;
 
@@ -563,7 +584,10 @@ function renderPriceChart(container, candles) {
       <polygon points="${areaPoints}" fill="url(#areaFill)" stroke="none" />
       <polyline points="${linePoints}" fill="none" style="stroke:${lineColor}; stroke-width:2; stroke-linecap:round; stroke-linejoin:round" />
       ${tickLabels
-        .map((t) => `<text x="${t.x}" y="${height - 6}" font-size="9" style="fill:var(--muted)" text-anchor="middle">${t.label}</text>`)
+        .map((t, i) => {
+          const anchor = i === 0 ? "start" : i === tickLabels.length - 1 ? "end" : "middle";
+          return `<text x="${t.x}" y="${height - 6}" font-size="9" style="fill:var(--muted)" text-anchor="${anchor}">${t.label}</text>`;
+        })
         .join("")}
       <text x="${padSide}" y="${padTop + 8}" font-size="9" style="fill:var(--muted)">${formatNumber(max)}</text>
       <text x="${padSide}" y="${height - padBottom - 4}" font-size="9" style="fill:var(--muted)">${formatNumber(min)}</text>

@@ -45,6 +45,7 @@
         </div>
       </div>
 
+      <div class="table-scroll">
       <table class="ticker-table">
         <thead>
           <tr>
@@ -63,11 +64,21 @@
           <!-- wird per JS gefüllt -->
         </tbody>
       </table>
+      </div>
 
       <p id="emptyState" class="empty-state hidden">
         Noch keine Aktien in der Watchlist. Oben nach einer Aktie suchen und hinzufügen.
       </p>
-      <p class="hint">Auf eine Zeile klicken für Firmenprofil &amp; Jahreschart.</p>
+      <p class="hint">Auf eine Zeile klicken für Firmenprofil, Kennzahlen, Analysten &amp; News.</p>
+    </section>
+
+    <section class="earnings-section">
+      <div class="section-header">
+        <h2>Nächste Quartalszahlen</h2>
+      </div>
+      <div id="earningsList">
+        <p class="data-note">Lade Termine...</p>
+      </div>
     </section>
 
     <footer class="settings-footer">
@@ -86,6 +97,7 @@
     </div>
   </div>
 
+  <script src="js/insights.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

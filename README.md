@@ -13,6 +13,10 @@ Aktien-Watchlist mit aktuellen Tageskursen.
 - Finanzkennzahlen im Firmenprofil: KGV, KUV, KBV, EV/EBITDA, EV/Umsatz, EBITDA-/Brutto-/operative/
   Nettomarge, ROE, Umsatz, EBITDA, Nettogewinn, EPS, Umsatzwachstum und Dividendenrendite.
   Umsatz, EBITDA und Nettogewinn werden aus den Pro-Aktie-Werten × ausstehende Aktien berechnet.
+- Analysten-Einschätzungen (Stark kaufen bis Stark verkaufen) als Balken mit Legende
+- Vergleich mit bis zu 4 Konkurrenten (KGV, KUV, KBV, Margen, Wachstum)
+- Aktuelle Nachrichten der letzten 14 Tage zur Firma
+- Kalender mit den nächsten Quartalszahlen-Terminen der Watchlist-Aktien
 - Kein Server nötig – reine HTML/CSS/JS-Seite
 
 ## Setup
@@ -41,7 +45,8 @@ Die Seite besteht nur aus statischen Dateien (`index.html`, `css/`, `js/`) und k
 ```
 index.html       Hauptseite
 css/style.css    Styling (Terminal-Look)
-js/app.js        Logik: Aktien-Suche, Watchlist, Kursabruf über Finnhub-API
+js/app.js        Logik: Aktien-Suche, Watchlist, Kursabruf, Firmenprofil, Chart
+js/insights.js   News, Analysten, Peer-Vergleich, Quartalszahlen-Kalender
 ```
 
 ## Hinweis zur API
