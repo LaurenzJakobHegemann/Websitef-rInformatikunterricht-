@@ -9,7 +9,14 @@ const app = document.getElementById("app");
 const apiKeyInput = document.getElementById("apiKeyInput");
 const saveApiKeyBtn = document.getElementById("saveApiKey");
 const setupError = document.getElementById("setupError");
-const resetKeyBtn = document.getElementById("resetKeyBtn");
+const setupTitle = document.getElementById("setupTitle");
+const cancelSetupBtn = document.getElementById("cancelSetup");
+const changeKeyBtn = document.getElementById("changeKeyBtn");
+
+const keyBanner = document.getElementById("keyBanner");
+const keyBannerText = document.getElementById("keyBannerText");
+const keyBannerChange = document.getElementById("keyBannerChange");
+const keyBannerClose = document.getElementById("keyBannerClose");
 
 const searchInput = document.getElementById("searchInput");
 const searchBtn = document.getElementById("searchBtn");
@@ -49,8 +56,7 @@ function init() {
   setInterval(updateClock, 1000);
 
   if (!apiKey) {
-    setupPanel.classList.remove("hidden");
-    app.classList.add("hidden");
+    openKeySetup();
   } else {
     startApp();
   }
@@ -59,11 +65,11 @@ function init() {
   apiKeyInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") handleSaveApiKey();
   });
+  cancelSetupBtn.addEventListener("click", closeKeySetup);
 
-  resetKeyBtn.addEventListener("click", () => {
-    localStorage.removeItem(API_KEY_STORAGE);
-    location.reload();
-  });
+  changeKeyBtn.addEventListener("click", openKeySetup);
+  keyBannerChange.addEventListener("click", openKeySetup);
+  keyBannerClose.addEventListener("click", () => keyBanner.classList.add("hidden"));
 
   searchBtn.addEventListener("click", handleSearch);
   searchInput.addEventListener("keydown", (e) => {
@@ -90,35 +96,73 @@ function updateClock() {
   clockEl.textContent = new Date().toLocaleTimeString("de-DE");
 }
 
+/* ---------- API-Key: Einrichtung und Hinweise ---------- */
+
+const KEY_CHECK_MESSAGES = {
+  invalid: "Finnhub kennt diesen Key nicht. Prüfe, ob du ihn vollständig und ohne Leerzeichen kopiert hast.",
+  limit: "Dieser Key hat sein Limit gerade erreicht. Warte eine Minute oder nimm einen anderen Key.",
+  unreachable: "Finnhub ist gerade nicht erreichbar. Prüfe deine Internetverbindung und versuche es erneut.",
+};
+
+const KEY_PROBLEM_MESSAGES = {
+  limit:
+    "Das Limit deines Finnhub-Keys ist erreicht (60 Anfragen pro Minute). Nach einer Minute geht es automatisch weiter, oder du gibst einen anderen Key ein.",
+  invalid: "Finnhub akzeptiert deinen API-Key nicht mehr. Gib einen gültigen Key ein.",
+};
+
+function openKeySetup() {
+  const hasKey = Boolean(apiKey);
+  setupTitle.textContent = hasKey ? "API-Key ändern" : "Willkommen im Parity Terminal";
+  cancelSetupBtn.classList.toggle("hidden", !hasKey);
+  apiKeyInput.value = "";
+  setupError.textContent = "";
+
+  closeDetail();
+  keyBanner.classList.add("hidden");
+  app.classList.add("hidden");
+  setupPanel.classList.remove("hidden");
+  window.scrollTo(0, 0);
+}
+
+function closeKeySetup() {
+  setupPanel.classList.add("hidden");
+  app.classList.remove("hidden");
+}
+
 async function handleSaveApiKey() {
   const key = apiKeyInput.value.trim();
   if (!key) {
-    setupError.textContent = "Bitte einen API-Key eingeben.";
+    setupError.textContent = "Bitte füge zuerst deinen API-Key ein.";
     return;
   }
 
   setupError.textContent = "Prüfe Key...";
-  const ok = await testApiKey(key);
-  if (!ok) {
-    setupError.textContent = "Key ungültig oder Finnhub nicht erreichbar. Bitte prüfen.";
+  saveApiKeyBtn.disabled = true;
+  const result = await checkApiKey(key);
+  saveApiKeyBtn.disabled = false;
+
+  if (result !== "ok") {
+    setupError.textContent = KEY_CHECK_MESSAGES[result];
     return;
   }
 
   apiKey = key;
   localStorage.setItem(API_KEY_STORAGE, key);
+  earningsCache.clear();
+  clearKeyProblem();
   setupPanel.classList.add("hidden");
   startApp();
 }
 
-async function testApiKey(key) {
-  try {
-    const res = await fetch(`https://finnhub.io/api/v1/quote?symbol=AAPL&token=${encodeURIComponent(key)}`);
-    if (!res.ok) return false;
-    const data = await res.json();
-    return typeof data.c === "number";
-  } catch {
-    return false;
-  }
+function showKeyProblem(kind) {
+  keyBanner.dataset.kind = kind;
+  keyBannerText.textContent = KEY_PROBLEM_MESSAGES[kind];
+  keyBanner.classList.remove("hidden");
+}
+
+function clearKeyProblem() {
+  delete keyBanner.dataset.kind;
+  keyBanner.classList.add("hidden");
 }
 
 function startApp() {
@@ -131,20 +175,12 @@ function startApp() {
   refreshTimer = setInterval(refreshWatchlist, REFRESH_INTERVAL_MS);
 }
 
-async function fetchQuote(symbol) {
-  const res = await fetch(
-    `https://finnhub.io/api/v1/quote?symbol=${encodeURIComponent(symbol)}&token=${encodeURIComponent(apiKey)}`
-  );
-  if (!res.ok) throw new Error("Quote fehlgeschlagen");
-  return res.json();
+function fetchQuote(symbol) {
+  return finnhubGet("/quote", { symbol });
 }
 
-async function searchSymbol(query) {
-  const res = await fetch(
-    `https://finnhub.io/api/v1/search?q=${encodeURIComponent(query)}&token=${encodeURIComponent(apiKey)}`
-  );
-  if (!res.ok) throw new Error("Suche fehlgeschlagen");
-  return res.json();
+function searchSymbol(query) {
+  return finnhubGet("/search", { q: query });
 }
 
 async function handleSearch() {
@@ -225,19 +261,22 @@ function renderWatchlist() {
 async function refreshWatchlist() {
   if (watchlist.length === 0) return;
 
-  await Promise.all(watchlist.map(updateRow));
-  lastUpdateEl.textContent = `Stand: ${new Date().toLocaleTimeString("de-DE")}`;
+  const updated = await Promise.all(watchlist.map(updateRow));
+  if (updated.some(Boolean)) {
+    lastUpdateEl.textContent = `Stand: ${new Date().toLocaleTimeString("de-DE")}`;
+  }
 }
 
+// Gibt true zurück, wenn neue Kursdaten angekommen sind.
 async function updateRow(symbol) {
   const row = document.getElementById(`row-${symbol}`);
-  if (!row) return;
+  if (!row) return false;
 
   try {
     const q = await fetchQuote(symbol);
     if (q.c === 0 && q.pc === 0) {
       row.querySelector('[data-field="price"]').textContent = "n/v";
-      return;
+      return true;
     }
 
     const isUp = q.d >= 0;
@@ -251,8 +290,11 @@ async function updateRow(symbol) {
     row.querySelector('[data-field="high"]').textContent = formatNumber(q.h);
     row.querySelector('[data-field="low"]').textContent = formatNumber(q.l);
     row.querySelector('[data-field="prevClose"]').textContent = formatNumber(q.pc);
-  } catch {
-    row.querySelector('[data-field="price"]').textContent = "Fehler";
+    return true;
+  } catch (err) {
+    // Bei Limit bleiben die letzten Kurse stehen; die Hinweisleiste erklärt, warum.
+    if (err.status !== 429) row.querySelector('[data-field="price"]').textContent = "Fehler";
+    return false;
   }
 }
 
@@ -270,21 +312,13 @@ function formatNumber(n) {
 /* ---------- Firmenprofil-Modal ---------- */
 
 async function fetchProfile(symbol) {
-  const res = await fetch(
-    `https://finnhub.io/api/v1/stock/profile2?symbol=${encodeURIComponent(symbol)}&token=${encodeURIComponent(apiKey)}`
-  );
-  if (!res.ok) throw new Error("Profil fehlgeschlagen");
-  const data = await res.json();
+  const data = await finnhubGet("/stock/profile2", { symbol });
   if (!data || !data.name) throw new Error("Kein Profil verfügbar");
   return data;
 }
 
 async function fetchExecutives(symbol) {
-  const res = await fetch(
-    `https://finnhub.io/api/v1/stock/executive?symbol=${encodeURIComponent(symbol)}&token=${encodeURIComponent(apiKey)}`
-  );
-  if (!res.ok) throw new Error("Executives nicht verfügbar (evtl. nur im bezahlten Plan)");
-  const data = await res.json();
+  const data = await finnhubGet("/stock/executive", { symbol });
   if (!data || !Array.isArray(data.executive) || data.executive.length === 0) {
     throw new Error("Keine Management-Daten verfügbar");
   }
@@ -294,11 +328,7 @@ async function fetchExecutives(symbol) {
 async function fetchCandles(symbol) {
   const to = Math.floor(Date.now() / 1000);
   const from = to - 365 * 24 * 60 * 60;
-  const res = await fetch(
-    `https://finnhub.io/api/v1/stock/candle?symbol=${encodeURIComponent(symbol)}&resolution=W&from=${from}&to=${to}&token=${encodeURIComponent(apiKey)}`
-  );
-  if (!res.ok) throw new Error("Historische Kurse nicht verfügbar (evtl. nur im bezahlten Plan)");
-  const data = await res.json();
+  const data = await finnhubGet("/stock/candle", { symbol, resolution: "W", from, to });
   if (!data || data.s !== "ok" || !Array.isArray(data.c) || data.c.length < 2) {
     throw new Error("Keine historischen Kurse für dieses Symbol");
   }
@@ -306,11 +336,7 @@ async function fetchCandles(symbol) {
 }
 
 async function fetchMetrics(symbol) {
-  const res = await fetch(
-    `https://finnhub.io/api/v1/stock/metric?symbol=${encodeURIComponent(symbol)}&metric=all&token=${encodeURIComponent(apiKey)}`
-  );
-  if (!res.ok) throw new Error("Kennzahlen nicht verfügbar");
-  const data = await res.json();
+  const data = await finnhubGet("/stock/metric", { symbol, metric: "all" });
   if (!data || !data.metric || Object.keys(data.metric).length === 0) {
     throw new Error("Keine Kennzahlen für dieses Symbol");
   }

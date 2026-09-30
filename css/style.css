@@ -60,49 +60,148 @@ body {
 .setup-panel {
   display: flex;
   justify-content: center;
-  align-items: center;
-  min-height: 80vh;
-  padding: 24px;
+  padding: 32px 16px;
 }
 
 .setup-box {
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 6px;
-  padding: 28px;
-  max-width: 420px;
-  text-align: center;
+  padding: 28px 24px;
+  max-width: 560px;
+  width: 100%;
+  line-height: 1.5;
 }
 
 .setup-box h2 {
-  margin-top: 0;
+  margin: 0 0 10px;
   color: var(--accent);
+  text-wrap: balance;
 }
 
 .setup-box a {
   color: var(--accent);
 }
 
+.setup-intro {
+  margin: 0 0 18px;
+}
+
+.setup-steps {
+  margin: 0 0 22px;
+  padding-left: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 0.9rem;
+}
+
+.setup-steps li::marker {
+  color: var(--accent);
+  font-weight: bold;
+}
+
+.setup-link {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.85rem;
+}
+
+.setup-label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
 .setup-box input {
   width: 100%;
-  padding: 10px;
-  margin: 14px 0 10px;
+  padding: 11px 12px;
+  margin-bottom: 10px;
   background: var(--bg);
   border: 1px solid var(--border);
   color: var(--text);
   border-radius: 4px;
   font-family: inherit;
+  font-size: 0.95rem;
 }
 
-.setup-box button {
-  width: 100%;
-  padding: 10px;
+.setup-box input:focus {
+  outline: 1px solid var(--accent);
+}
+
+.setup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.setup-actions button {
+  flex: 1 1 180px;
+  padding: 11px;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.setup-note {
+  margin: 14px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.8rem;
 }
 
 .error {
   color: var(--red);
   min-height: 1.2em;
   font-size: 0.85rem;
+  margin: 8px 0 0;
+}
+
+/* Hinweisleiste bei Limit oder ungültigem Key */
+.key-banner {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 60;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+  background: var(--panel-raised);
+  border-top: 2px solid var(--accent);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+body:has(.key-banner:not(.hidden)) main {
+  padding-bottom: 140px;
+}
+
+.key-banner[data-kind="invalid"] {
+  border-top-color: var(--red);
+}
+
+.key-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.key-banner-close {
+  background: transparent;
+  color: var(--muted);
+  font-size: 1.3rem;
+  line-height: 1;
+  padding: 4px 8px;
 }
 
 /* Main app */

@@ -21,9 +21,16 @@ Aktien-Watchlist mit aktuellen Tageskursen.
 
 ## Setup
 
-1. Kostenlosen API-Key bei [finnhub.io/register](https://finnhub.io/register) holen (keine Kreditkarte nötig).
-2. Seite öffnen (siehe unten) und den Key beim ersten Start einfügen.
-   Der Key wird nur lokal im Browser gespeichert (`localStorage`), nicht im Code oder auf GitHub.
+Jeder Nutzer verwendet seinen eigenen, kostenlosen Finnhub-Key. Es gibt kein Backend und keinen
+gemeinsamen Key; das Limit (60 Anfragen/Minute) gilt pro Key.
+
+Beim ersten Öffnen erklärt die Seite Schritt für Schritt, wie man den Key bekommt
+([finnhub.io/register](https://finnhub.io/register), E-Mail bestätigen, Key im Dashboard kopieren)
+und prüft ihn beim Speichern. Der Key wird nur lokal im Browser gespeichert (`localStorage`).
+
+Ist das Limit erreicht oder wird der Key ungültig, erscheint unten eine Hinweisleiste mit dem Button
+„Neuen Key eingeben“. Über „API-Key ändern“ unten auf der Seite lässt sich der Key jederzeit wechseln;
+die Watchlist bleibt dabei erhalten.
 
 ## Lokal starten
 
@@ -45,7 +52,8 @@ Die Seite besteht nur aus statischen Dateien (`index.html`, `css/`, `js/`) und k
 ```
 index.html       Hauptseite
 css/style.css    Styling (Terminal-Look)
-js/app.js        Logik: Aktien-Suche, Watchlist, Kursabruf, Firmenprofil, Chart
+js/api.js        Finnhub-Anbindung, erkennt Limit und ungültigen Key
+js/app.js        Logik: Key-Einrichtung, Aktien-Suche, Watchlist, Firmenprofil, Chart
 js/insights.js   News, Analysten, Peer-Vergleich, Quartalszahlen-Kalender
 ```
 

@@ -1,12 +1,5 @@
 // News, Analysten, Peer-Vergleich und Quartalszahlen-Kalender.
-// Wird vor app.js geladen; nutzt apiKey, watchlist und Formatierer aus app.js erst beim Aufruf.
-
-async function finnhubGet(path, params = {}) {
-  const query = new URLSearchParams({ ...params, token: apiKey });
-  const res = await fetch(`https://finnhub.io/api/v1${path}?${query}`);
-  if (!res.ok) throw new Error(`Finnhub ${path}: HTTP ${res.status}`);
-  return res.json();
-}
+// Wird vor app.js geladen; nutzt watchlist und Formatierer aus app.js erst beim Aufruf.
 
 function escapeHtml(value) {
   return String(value ?? "").replace(
@@ -198,7 +191,7 @@ async function refreshEarnings() {
       try {
         earningsCache.set(s, await fetchNextEarnings(s));
       } catch {
-        earningsCache.set(s, null);
+        // Nicht cachen, damit der nächste Aufruf es erneut versucht (z. B. nach Limit).
       }
     })
   );

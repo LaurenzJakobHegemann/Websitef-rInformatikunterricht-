@@ -13,20 +13,60 @@
     <div class="clock" id="clock">--:--:--</div>
   </header>
 
-  <!-- API-Key-Eingabe: erscheint nur, solange kein Key im Browser gespeichert ist -->
+  <!-- Einrichtung: erscheint beim ersten Öffnen und wenn man den Key ändern will -->
   <section id="setupPanel" class="setup-panel hidden">
     <div class="setup-box">
-      <h2>Finnhub API-Key einrichten</h2>
-      <p>
-        Für Live-Kurse brauchst du einen kostenlosen API-Key von
-        <a href="https://finnhub.io/register" target="_blank" rel="noopener">finnhub.io</a>.
-        Der Key wird nur in deinem Browser gespeichert (localStorage), nicht im Code.
+      <h2 id="setupTitle">Willkommen im Parity Terminal</h2>
+      <p class="setup-intro">
+        Live-Kurse und Firmendaten kommen von <strong>Finnhub</strong>, einem Anbieter für Finanzdaten.
+        Dafür brauchst du einen eigenen, kostenlosen API-Key. Das dauert etwa 2 Minuten.
       </p>
-      <input type="text" id="apiKeyInput" placeholder="API-Key einfügen...">
-      <button id="saveApiKey">Speichern</button>
-      <p class="error" id="setupError"></p>
+
+      <ol class="setup-steps">
+        <li>
+          <strong>Kostenloses Konto anlegen.</strong>
+          Registriere dich bei Finnhub mit E-Mail und Passwort oder mit Google. Eine Kreditkarte brauchst du nicht.
+          <a class="setup-link" href="https://finnhub.io/register" target="_blank" rel="noopener noreferrer">Finnhub-Registrierung öffnen</a>
+        </li>
+        <li>
+          <strong>E-Mail bestätigen.</strong>
+          Öffne die Bestätigungsmail von Finnhub und klicke auf den Link darin.
+        </li>
+        <li>
+          <strong>Key kopieren.</strong>
+          Melde dich an. Im Dashboard steht ganz oben unter „API Key“ eine lange Zeichenkette. Kopiere sie vollständig.
+          <a class="setup-link" href="https://finnhub.io/dashboard" target="_blank" rel="noopener noreferrer">Finnhub-Dashboard öffnen</a>
+        </li>
+        <li>
+          <strong>Key hier einfügen.</strong>
+          Füge den Key in das Feld ein und tippe auf „Key prüfen und speichern“.
+        </li>
+      </ol>
+
+      <label class="setup-label" for="apiKeyInput">Dein Finnhub API-Key</label>
+      <input type="text" id="apiKeyInput" placeholder="z. B. c1a2b3c4d5e6f7g8h9i0" autocomplete="off" spellcheck="false">
+      <div class="setup-actions">
+        <button id="saveApiKey">Key prüfen und speichern</button>
+        <button id="cancelSetup" class="secondary hidden">Abbrechen</button>
+      </div>
+      <p class="error" id="setupError" role="alert"></p>
+
+      <p class="setup-note">
+        Dein Key bleibt nur in diesem Browser gespeichert und wird nur an Finnhub gesendet.
+        Der kostenlose Plan erlaubt 60 Anfragen pro Minute. Ist das Limit erreicht, zeigt die Seite
+        einen Hinweis, und du kannst einen anderen Key eingeben.
+      </p>
     </div>
   </section>
+
+  <!-- Hinweisleiste bei Limit oder ungültigem Key -->
+  <div id="keyBanner" class="key-banner hidden" role="status">
+    <span id="keyBannerText"></span>
+    <div class="key-banner-actions">
+      <button id="keyBannerChange">Neuen Key eingeben</button>
+      <button id="keyBannerClose" class="key-banner-close" aria-label="Hinweis schließen">&times;</button>
+    </div>
+  </div>
 
   <main id="app" class="hidden">
 
@@ -82,7 +122,7 @@
     </section>
 
     <footer class="settings-footer">
-      <button id="resetKeyBtn">API-Key zurücksetzen</button>
+      <button id="changeKeyBtn">API-Key ändern</button>
     </footer>
 
   </main>
@@ -97,6 +137,7 @@
     </div>
   </div>
 
+  <script src="js/api.js"></script>
   <script src="js/insights.js"></script>
   <script src="js/app.js"></script>
 </body>
