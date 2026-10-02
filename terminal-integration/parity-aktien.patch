@@ -1,0 +1,2739 @@
+diff --git a/src/app/aktien/page.tsx b/src/app/aktien/page.tsx
+new file mode 100644
+index 0000000..8df6123
+--- /dev/null
++++ b/src/app/aktien/page.tsx
+@@ -0,0 +1,11 @@
++import type { Metadata } from 'next';
++import StocksApp from '@/components/stocks/StocksApp';
++
++export const metadata: Metadata = {
++  title: 'Aktien',
++  description: 'Watchlist, Firmenprofile, Finanzkennzahlen und Quartalszahlen für Parity-Mitglieder.',
++};
++
++export default function AktienPage() {
++  return <StocksApp />;
++}
+diff --git a/src/app/page.tsx b/src/app/page.tsx
+index 8fd0123..1a0a72c 100644
+--- a/src/app/page.tsx
++++ b/src/app/page.tsx
+@@ -2,8 +2,9 @@
+ 
+ import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
+ import dynamic from 'next/dynamic';
++import Link from 'next/link';
+ import { motion, AnimatePresence } from 'framer-motion';
+-import { Layers, BarChart3, Search, X, Globe, MapPinned, Satellite, Moon, ExternalLink, AlertTriangle, Activity, Database, Wifi, Play, Crosshair } from 'lucide-react';
++import { Layers, BarChart3, Search, X, Globe, MapPinned, Satellite, Moon, ExternalLink, AlertTriangle, Activity, Database, Wifi, Play, Crosshair, TrendingUp } from 'lucide-react';
+ 
+ /** Unwrap longitudes to prevent 340° dateline jumps in Mapbox rendering.
+  *  Converts [-163, 176] -> [-163, -184] so line crosses dateline correctly. */
+@@ -987,6 +988,11 @@ export default function Dashboard() {
+           </AnimatePresence>
+         </div>
+ 
++        {/* ── AKTIEN (Watchlist, Firmenprofile, Kennzahlen) ── */}
++        <Link href="/aktien" title="Aktien" aria-label="Aktien: Watchlist und Firmenprofile" className="w-8 h-8 rounded-full flex items-center justify-center transition-colors hover:bg-black/5">
++          <TrendingUp className="w-4 h-4 text-[var(--text-muted)]" />
++        </Link>
++
+         <div className="relative group">
+           <button onClick={() => { setShowAlerts(!showAlerts); setShowMarkets(false); setShowLocalIntel(false); }} className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${showAlerts ? 'bg-[#FF3D3D]/20' : 'hover:bg-black/5'}`}>
+             <AlertTriangle className={`w-4 h-4 ${showAlerts ? 'text-[#FF3D3D]' : 'text-[var(--text-muted)]'}`} />
+@@ -1117,6 +1123,11 @@ export default function Dashboard() {
+                   <span>{tab.label}</span>
+                 </button>
+               ))}
++              <Link href="/aktien" className="mobile-nav-btn">
++                <TrendingUp className="w-4 h-4" />
++                <span>AKTIEN</span>
++              </Link>
++
+             </div>
+           </div>
+ 
+diff --git a/src/components/stocks/CompanyDetail.tsx b/src/components/stocks/CompanyDetail.tsx
+new file mode 100644
+index 0000000..0de5332
+--- /dev/null
++++ b/src/components/stocks/CompanyDetail.tsx
+@@ -0,0 +1,314 @@
++'use client';
++
++import { useEffect, useRef, useState } from 'react';
++import {
++  fetchCandles, fetchCompanyNews, fetchExecutives, fetchMetrics, fetchPeers, fetchProfile, fetchQuote,
++  fetchRecommendation,
++} from '@/lib/stocks/finnhub';
++import {
++  PEER_COLUMNS, RATING_SEGMENTS, buildFinancials, formatNumber, formatUsdMillions, pick, safeUrl,
++  summarizeRecommendation, type MetricTile,
++} from '@/lib/stocks/financials';
++import type {
++  Candles, CompanyProfile, Executive, Metrics, NewsItem, Quote, Recommendation,
++} from '@/lib/stocks/types';
++import PriceChart from './PriceChart';
++import styles from './stocks.module.css';
++
++interface DetailData {
++  profile: CompanyProfile | null;
++  quote: Quote | null;
++  candles: Candles | null;
++  metrics: Metrics | null;
++  recommendation: Recommendation | null;
++  news: NewsItem[] | null;
++  executives: Executive[] | null;
++}
++
++type PeerState = { status: 'loading' } | { status: 'done'; rows: { symbol: string; metric: Metrics | null }[] } | { status: 'none' };
++
++const SEGMENT_CLASS: Record<(typeof RATING_SEGMENTS)[number]['key'], string> = {
++  strongBuy: styles.segStrongBuy,
++  buy: styles.segBuy,
++  hold: styles.segHold,
++  sell: styles.segSell,
++  strongSell: styles.segStrongSell,
++};
++
++const PLAN_NOTE = 'bei Finnhub teils nur im bezahlten Plan enthalten';
++const monthYear = new Intl.DateTimeFormat('de-DE', { month: 'long', year: 'numeric' });
++const shortDate = new Intl.DateTimeFormat('de-DE', { day: '2-digit', month: 'short' });
++
++function settled<T>(r: PromiseSettledResult<T>): T | null {
++  return r.status === 'fulfilled' ? r.value : null;
++}
++
++export default function CompanyDetail({ symbol, onClose }: { symbol: string; onClose: () => void }) {
++  const [data, setData] = useState<DetailData | null>(null);
++  const [peers, setPeers] = useState<PeerState>({ status: 'loading' });
++  const closeRef = useRef<HTMLButtonElement>(null);
++
++  useEffect(() => {
++    closeRef.current?.focus();
++    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
++    document.addEventListener('keydown', onKey);
++    return () => document.removeEventListener('keydown', onKey);
++  }, [onClose]);
++
++  useEffect(() => {
++    let cancelled = false;
++
++    (async () => {
++      const r = await Promise.allSettled([
++        fetchProfile(symbol), fetchQuote(symbol), fetchCandles(symbol), fetchMetrics(symbol),
++        fetchRecommendation(symbol), fetchCompanyNews(symbol), fetchExecutives(symbol),
++      ]);
++      if (cancelled) return;
++      const loaded: DetailData = {
++        profile: settled(r[0]), quote: settled(r[1]), candles: settled(r[2]), metrics: settled(r[3]),
++        recommendation: settled(r[4]), news: settled(r[5]), executives: settled(r[6]),
++      };
++      setData(loaded);
++
++      try {
++        const symbols = await fetchPeers(symbol);
++        if (symbols.length < 2) {
++          if (!cancelled) setPeers({ status: 'none' });
++          return;
++        }
++        const metrics = await Promise.allSettled(
++          symbols.map((s) => (s === symbol && loaded.metrics ? Promise.resolve(loaded.metrics) : fetchMetrics(s)))
++        );
++        if (!cancelled) setPeers({ status: 'done', rows: symbols.map((s, i) => ({ symbol: s, metric: settled(metrics[i]) })) });
++      } catch {
++        if (!cancelled) setPeers({ status: 'none' });
++      }
++    })();
++
++    return () => { cancelled = true; };
++  }, [symbol]);
++
++  return (
++    <div className={styles.overlay} onClick={onClose}>
++      <aside
++        className={styles.panel}
++        role="dialog"
++        aria-modal="true"
++        aria-label={`Firmenprofil ${symbol}`}
++        onClick={(e) => e.stopPropagation()}
++      >
++        <button ref={closeRef} type="button" className={`${styles.btn} ${styles.btnSm} ${styles.close}`} onClick={onClose}>
++          Schließen
++        </button>
++        {!data ? <p className={styles.loading}>Lade Firmendaten für {symbol} …</p> : <DetailBody symbol={symbol} data={data} peers={peers} />}
++      </aside>
++    </div>
++  );
++}
++
++function DetailBody({ symbol, data, peers }: { symbol: string; data: DetailData; peers: PeerState }) {
++  const { profile, quote, candles, metrics, recommendation, news, executives } = data;
++
++  if (!profile) {
++    return <p className={styles.loading}>Das Firmenprofil für {symbol} konnte nicht geladen werden. Versuche es gleich noch einmal.</p>;
++  }
++
++  const logo = safeUrl(profile.logo);
++  const web = safeUrl(profile.weburl);
++  const currency = profile.currency || 'USD';
++
++  return (
++    <>
++      <div className={styles.profileHead}>
++        {/* Externe Logos unbekannter Größe; next/image bräuchte dafür eine Image-Optimierung im Worker. */}
++        {/* eslint-disable-next-line @next/next/no-img-element */}
++        {logo && <img className={styles.logo} src={logo} alt="" onError={(e) => { e.currentTarget.style.display = 'none'; }} />}
++        <div>
++          <p className={styles.eyebrow} style={{ marginBottom: 6 }}>Firmenprofil</p>
++          <h2 className={styles.profileName}>{profile.name}</h2>
++        </div>
++      </div>
++      <div className={styles.badges}>
++        <span className={`${styles.badge} ${styles.badgeActive}`}>{symbol}</span>
++        {profile.exchange && <span className={styles.badge}>{profile.exchange}</span>}
++        {profile.country && <span className={styles.badge}>{profile.country}</span>}
++      </div>
++
++      {quote && quote.c > 0 && (
++        <div className={styles.priceLine}>
++          <span className={styles.price}>{formatNumber(quote.c)} {currency}</span>
++          {typeof quote.dp === 'number' && (
++            <span className={quote.dp >= 0 ? styles.up : styles.down}>
++              {quote.dp >= 0 ? '+' : ''}{formatNumber(quote.d)} ({quote.dp >= 0 ? '+' : ''}{formatNumber(quote.dp)} %) heute
++            </span>
++          )}
++        </div>
++      )}
++
++      <section className={styles.block}>
++        <dl className={styles.facts}>
++          <Fact label="Branche" value={profile.finnhubIndustry} />
++          <Fact label="Marktkapitalisierung" value={formatUsdMillions(profile.marketCapitalization)} />
++          <Fact label="Börsengang" value={profile.ipo} />
++          <Fact label="Ausstehende Aktien" value={profile.shareOutstanding ? `${formatNumber(profile.shareOutstanding, 1)} Mio.` : undefined} />
++          <Fact label="Währung" value={profile.currency} />
++          <div>
++            <dt>Website</dt>
++            <dd>{web ? <a href={web} target="_blank" rel="noopener noreferrer">{new URL(web).hostname.replace(/^www\./, '')}</a> : '–'}</dd>
++          </div>
++        </dl>
++      </section>
++
++      <section className={styles.block}>
++        <p className={styles.eyebrow}>Kursverlauf · 1 Jahr</p>
++        {candles ? <PriceChart candles={candles} currency={currency} /> : <p className={styles.dataNote}>Kein Kursverlauf verfügbar ({PLAN_NOTE}).</p>}
++      </section>
++
++      <section className={styles.block}>
++        <p className={styles.eyebrow}>Analysten-Einschätzungen</p>
++        <AnalystRatings recommendation={recommendation} />
++      </section>
++
++      <section className={styles.block}>
++        <p className={styles.eyebrow}>Finanzkennzahlen</p>
++        {metrics ? <Financials metrics={metrics} profile={profile} /> : <p className={styles.dataNote}>Keine Finanzkennzahlen verfügbar.</p>}
++      </section>
++
++      <section className={styles.block}>
++        <p className={styles.eyebrow}>Vergleich mit Konkurrenten</p>
++        <PeerTable symbol={symbol} peers={peers} />
++      </section>
++
++      <section className={styles.block}>
++        <p className={styles.eyebrow}>Aktuelle Nachrichten</p>
++        <NewsList news={news} />
++      </section>
++
++      <section className={styles.block}>
++        <p className={styles.eyebrow}>Management</p>
++        {executives ? (
++          <ul className={styles.execs}>
++            {executives.map((e) => (
++              <li key={`${e.name}-${e.title}`}><span>{e.name}</span><span className={styles.execTitle}>{e.title}</span></li>
++            ))}
++          </ul>
++        ) : (
++          <p className={styles.dataNote}>Keine Management-Daten verfügbar ({PLAN_NOTE}).</p>
++        )}
++      </section>
++    </>
++  );
++}
++
++function Fact({ label, value }: { label: string; value: string | undefined }) {
++  return (
++    <div>
++      <dt>{label}</dt>
++      <dd>{value || '–'}</dd>
++    </div>
++  );
++}
++
++function AnalystRatings({ recommendation }: { recommendation: Recommendation | null }) {
++  const summary = recommendation ? summarizeRecommendation(recommendation) : null;
++  if (!recommendation || !summary) return <p className={styles.dataNote}>Keine Analysten-Einschätzungen verfügbar.</p>;
++
++  return (
++    <>
++      <p className={styles.ratingSummary}>
++        <strong>{summary.bullishPercent} %</strong>
++        von {summary.total} Analysten empfehlen Kaufen
++        <span className={styles.meta}> · Stand {monthYear.format(new Date(recommendation.period))}</span>
++      </p>
++      <div className={styles.ratingBar} aria-hidden="true">
++        {RATING_SEGMENTS.filter((s) => recommendation[s.key] > 0).map((s) => (
++          <span key={s.key} className={`${styles.ratingSeg} ${SEGMENT_CLASS[s.key]}`} style={{ flexGrow: recommendation[s.key] }} />
++        ))}
++      </div>
++      <ul className={styles.ratingLegend}>
++        {RATING_SEGMENTS.map((s) => (
++          <li key={s.key}>
++            <span className={`${styles.swatch} ${SEGMENT_CLASS[s.key]}`} />
++            {s.label} <strong>{recommendation[s.key] || 0}</strong>
++          </li>
++        ))}
++      </ul>
++    </>
++  );
++}
++
++function Financials({ metrics, profile }: { metrics: Metrics; profile: CompanyProfile }) {
++  const f = buildFinancials(metrics, profile);
++  return (
++    <>
++      <MetricGroup title="Bewertung" tiles={f.valuation} />
++      <MetricGroup title="Profitabilität" tiles={f.profitability} />
++      <MetricGroup title="Umsatz und Gewinn" tiles={f.absolute} />
++    </>
++  );
++}
++
++function MetricGroup({ title, tiles }: { title: string; tiles: MetricTile[] }) {
++  return (
++    <div className={styles.metricGroup}>
++      <h3 className={styles.metricGroupTitle}>{title}</h3>
++      <div className={styles.metricGrid}>
++        {tiles.map((t) => (
++          <div key={t.label} className={styles.metric}>
++            <span className={styles.metricLabel}>{t.label}</span>
++            <span className={styles.metricValue}>{t.value}</span>
++            <span className={styles.metricHint}>{t.hint}</span>
++          </div>
++        ))}
++      </div>
++    </div>
++  );
++}
++
++function PeerTable({ symbol, peers }: { symbol: string; peers: PeerState }) {
++  if (peers.status === 'loading') return <p className={styles.dataNote}>Lade Vergleich …</p>;
++  if (peers.status === 'none') return <p className={styles.dataNote}>Kein Vergleich mit Konkurrenten verfügbar.</p>;
++
++  return (
++    <div className={styles.tableScroll}>
++      <table className={styles.table}>
++        <thead>
++          <tr>
++            <th scope="col">Symbol</th>
++            {PEER_COLUMNS.map((c) => <th key={c.label} scope="col">{c.label}</th>)}
++          </tr>
++        </thead>
++        <tbody>
++          {peers.rows.map((row) => (
++            <tr key={row.symbol} className={row.symbol === symbol ? styles.peerCurrent : undefined}>
++              <td>{row.symbol}</td>
++              {PEER_COLUMNS.map((c) => <td key={c.label}>{row.metric ? c.format(pick(row.metric, [...c.keys])) : '–'}</td>)}
++            </tr>
++          ))}
++        </tbody>
++      </table>
++    </div>
++  );
++}
++
++function NewsList({ news }: { news: NewsItem[] | null }) {
++  if (!news || news.length === 0) return <p className={styles.dataNote}>Keine Nachrichten aus den letzten 14 Tagen gefunden.</p>;
++
++  return (
++    <ul className={styles.news}>
++      {news.map((n) => {
++        const url = safeUrl(n.url);
++        return (
++          <li key={n.id ?? `${n.datetime}-${n.headline}`} className={styles.newsItem}>
++            <div className={styles.newsMeta}>{n.source} · {shortDate.format(new Date(n.datetime * 1000))}</div>
++            {url ? (
++              <a className={styles.newsLink} href={url} target="_blank" rel="noopener noreferrer">{n.headline}</a>
++            ) : (
++              <span className={styles.newsLink}>{n.headline}</span>
++            )}
++          </li>
++        );
++      })}
++    </ul>
++  );
++}
+diff --git a/src/components/stocks/EarningsList.tsx b/src/components/stocks/EarningsList.tsx
+new file mode 100644
+index 0000000..819de26
+--- /dev/null
++++ b/src/components/stocks/EarningsList.tsx
+@@ -0,0 +1,54 @@
++'use client';
++
++import type { EarningsEvent } from '@/lib/stocks/types';
++import { EARNINGS_WINDOW_DAYS, parseIsoDate } from '@/lib/stocks/finnhub';
++import { EARNINGS_HOUR_LABELS, daysUntil, formatNumber, relativeDayLabel } from '@/lib/stocks/financials';
++import styles from './stocks.module.css';
++
++const dateLabel = new Intl.DateTimeFormat('de-DE', { weekday: 'short', day: '2-digit', month: 'long' });
++
++interface EarningsListProps {
++  symbols: string[];
++  /** `undefined` = noch nicht geladen, `null` = kein Termin im Zeitraum. */
++  earnings: Record<string, EarningsEvent | null | undefined>;
++  onOpen: (symbol: string) => void;
++}
++
++export default function EarningsList({ symbols, earnings, onOpen }: EarningsListProps) {
++  const loading = symbols.some((s) => earnings[s] === undefined);
++  const entries = symbols
++    .map((s) => earnings[s])
++    .filter((e): e is EarningsEvent => Boolean(e))
++    .sort((a, b) => a.date.localeCompare(b.date));
++
++  if (entries.length === 0) {
++    return (
++      <p className={styles.dataNote}>
++        {loading ? 'Lade Termine …' : `Keine Termine in den nächsten ${EARNINGS_WINDOW_DAYS} Tagen für deine Watchlist.`}
++      </p>
++    );
++  }
++
++  return (
++    <ul className={styles.earnings}>
++      {entries.map((e) => {
++        const date = parseIsoDate(e.date);
++        const details = [
++          e.quarter && e.year ? `Q${e.quarter} ${e.year}` : null,
++          e.hour ? EARNINGS_HOUR_LABELS[e.hour] : null,
++          typeof e.epsEstimate === 'number' ? `EPS-Schätzung ${formatNumber(e.epsEstimate)} USD` : null,
++        ].filter(Boolean);
++        return (
++          <li key={e.symbol} className={styles.earningsCard}>
++            <div className={styles.earningsDate}>{dateLabel.format(date)}</div>
++            <div className={styles.earningsWhen}>{relativeDayLabel(daysUntil(date))}</div>
++            <button type="button" className={styles.symbolButton} onClick={() => onOpen(e.symbol)}>
++              {e.symbol}
++            </button>
++            {details.length > 0 && <div className={styles.earningsDetail}>{details.join(' · ')}</div>}
++          </li>
++        );
++      })}
++    </ul>
++  );
++}
+diff --git a/src/components/stocks/KeyBanner.tsx b/src/components/stocks/KeyBanner.tsx
+new file mode 100644
+index 0000000..688ff1f
+--- /dev/null
++++ b/src/components/stocks/KeyBanner.tsx
+@@ -0,0 +1,42 @@
++'use client';
++
++import type { KeyProblem } from '@/lib/stocks/finnhub';
++import styles from './stocks.module.css';
++
++const MESSAGES: Record<KeyProblem, { title: string; text: string }> = {
++  limit: {
++    title: 'Limit erreicht.',
++    text: 'Dein Finnhub-Key hat 60 Anfragen pro Minute verbraucht. Nach einer Minute geht es automatisch weiter, oder du gibst einen anderen Key ein.',
++  },
++  invalid: {
++    title: 'Key ungültig.',
++    text: 'Finnhub akzeptiert deinen API-Key nicht mehr. Gib einen gültigen Key ein.',
++  },
++};
++
++interface KeyBannerProps {
++  problem: KeyProblem;
++  onChangeKey: () => void;
++  onDismiss: () => void;
++}
++
++export default function KeyBanner({ problem, onChangeKey, onDismiss }: KeyBannerProps) {
++  const { title, text } = MESSAGES[problem];
++  return (
++    <div className={styles.banner} role="status">
++      <div className={styles.bannerInner}>
++        <p className={styles.bannerText}>
++          <strong>{title}</strong> {text}
++        </p>
++        <div className={styles.bannerActions}>
++          <button type="button" className={`${styles.btn} ${styles.btnOnBlue} ${styles.btnSm}`} onClick={onChangeKey}>
++            Neuen Key eingeben
++          </button>
++          <button type="button" className={styles.bannerClose} onClick={onDismiss} aria-label="Hinweis schließen">
++            ×
++          </button>
++        </div>
++      </div>
++    </div>
++  );
++}
+diff --git a/src/components/stocks/KeySetup.tsx b/src/components/stocks/KeySetup.tsx
+new file mode 100644
+index 0000000..87b5021
+--- /dev/null
++++ b/src/components/stocks/KeySetup.tsx
+@@ -0,0 +1,110 @@
++'use client';
++
++import { useState } from 'react';
++import { checkApiKey, type KeyCheckResult } from '@/lib/stocks/finnhub';
++import styles from './stocks.module.css';
++
++const CHECK_MESSAGES: Record<Exclude<KeyCheckResult, 'ok'>, string> = {
++  invalid: 'Finnhub kennt diesen Key nicht. Prüfe, ob du ihn vollständig und ohne Leerzeichen kopiert hast.',
++  limit: 'Dieser Key hat sein Limit gerade erreicht. Warte eine Minute oder nimm einen anderen Key.',
++  unreachable: 'Finnhub ist gerade nicht erreichbar. Prüfe deine Internetverbindung und versuche es erneut.',
++};
++
++interface KeySetupProps {
++  isChange: boolean;
++  onSaved: (key: string) => void;
++  onCancel?: () => void;
++}
++
++export default function KeySetup({ isChange, onSaved, onCancel }: KeySetupProps) {
++  const [value, setValue] = useState('');
++  const [message, setMessage] = useState('');
++  const [checking, setChecking] = useState(false);
++
++  async function handleSubmit(e: React.FormEvent) {
++    e.preventDefault();
++    const key = value.trim();
++    if (!key) {
++      setMessage('Bitte füge zuerst deinen API-Key ein.');
++      return;
++    }
++    setChecking(true);
++    setMessage('Prüfe Key …');
++    const result = await checkApiKey(key);
++    setChecking(false);
++    if (result === 'ok') {
++      onSaved(key);
++    } else {
++      setMessage(CHECK_MESSAGES[result]);
++    }
++  }
++
++  return (
++    <section className={styles.section}>
++      <div className={`${styles.inner} ${styles.setup}`}>
++        <p className={styles.eyebrow}>{isChange ? 'Einstellungen' : 'Einrichtung · ca. 2 Minuten'}</p>
++        <h1 className={styles.title}>{isChange ? 'API-Key ändern' : 'Aktien im Parity Terminal'}</h1>
++        <p className={styles.lead}>
++          Kurse, Kennzahlen und Firmendaten kommen von Finnhub, einem Anbieter für Finanzdaten. Dafür brauchst du
++          einen eigenen, kostenlosen API-Key. Jeder Nutzer verwendet seinen eigenen Key.
++        </p>
++
++        <ol className={styles.steps}>
++          <li className={styles.step}>
++            <h3>Konto anlegen</h3>
++            <p>Registriere dich kostenlos bei Finnhub, mit E-Mail und Passwort oder mit Google. Eine Kreditkarte brauchst du nicht.</p>
++            <a className={styles.stepLink} href="https://finnhub.io/register" target="_blank" rel="noopener noreferrer">
++              Finnhub-Registrierung öffnen ↗
++            </a>
++          </li>
++          <li className={styles.step}>
++            <h3>E-Mail bestätigen</h3>
++            <p>Öffne die Bestätigungsmail von Finnhub und klicke auf den Link darin.</p>
++          </li>
++          <li className={styles.step}>
++            <h3>Key kopieren</h3>
++            <p>Melde dich an. Im Dashboard steht ganz oben unter „API Key“ eine lange Zeichenkette. Kopiere sie vollständig.</p>
++            <a className={styles.stepLink} href="https://finnhub.io/dashboard" target="_blank" rel="noopener noreferrer">
++              Finnhub-Dashboard öffnen ↗
++            </a>
++          </li>
++          <li className={styles.step}>
++            <h3>Key einfügen</h3>
++            <p>Füge den Key unten ein und tippe auf „Key prüfen und speichern“.</p>
++          </li>
++        </ol>
++
++        <form className={styles.setupForm} onSubmit={handleSubmit} noValidate>
++          <label className={styles.label} htmlFor="finnhub-key">Dein Finnhub API-Key</label>
++          <input
++            id="finnhub-key"
++            className={styles.input}
++            type="text"
++            value={value}
++            onChange={(e) => setValue(e.target.value)}
++            placeholder="z. B. c1a2b3c4d5e6f7g8h9i0"
++            autoComplete="off"
++            spellCheck={false}
++            autoFocus={isChange}
++          />
++          <div className={styles.setupActions}>
++            <button type="submit" className={`${styles.btn} ${styles.btnSolid}`} disabled={checking}>
++              Key prüfen und speichern
++            </button>
++            {onCancel && (
++              <button type="button" className={styles.btn} onClick={onCancel}>
++                Abbrechen
++              </button>
++            )}
++          </div>
++          <p className={styles.error} role="alert">{message}</p>
++        </form>
++
++        <p className={styles.note}>
++          Dein Key bleibt nur in diesem Browser gespeichert und wird nur an Finnhub gesendet. Der kostenlose Plan erlaubt
++          60 Anfragen pro Minute. Ist das Limit erreicht, zeigt die Seite einen Hinweis, und du kannst einen anderen Key eingeben.
++        </p>
++      </div>
++    </section>
++  );
++}
+diff --git a/src/components/stocks/PriceChart.tsx b/src/components/stocks/PriceChart.tsx
+new file mode 100644
+index 0000000..4d4d1a0
+--- /dev/null
++++ b/src/components/stocks/PriceChart.tsx
+@@ -0,0 +1,106 @@
++'use client';
++
++import { useMemo, useRef, useState } from 'react';
++import type { Candles } from '@/lib/stocks/types';
++import { formatNumber } from '@/lib/stocks/financials';
++import styles from './stocks.module.css';
++
++const WIDTH = 640;
++const HEIGHT = 220;
++const PAD_TOP = 10;
++const PAD_BOTTOM = 26;
++const PAD_LEFT = 56; // Platz für die Kursbeschriftung links, damit sie nie auf der Linie liegt
++const PAD_RIGHT = 4;
++const TICKS = 5;
++
++const monthLabel = new Intl.DateTimeFormat('de-DE', { month: 'short', year: '2-digit' });
++const dayLabel = new Intl.DateTimeFormat('de-DE', { day: '2-digit', month: 'short', year: 'numeric' });
++
++export default function PriceChart({ candles, currency = 'USD' }: { candles: Candles; currency?: string }) {
++  const svgRef = useRef<SVGSVGElement>(null);
++  const [hover, setHover] = useState<number | null>(null);
++
++  const geometry = useMemo(() => {
++    const prices = candles.c;
++    const min = Math.min(...prices);
++    const max = Math.max(...prices);
++    const range = max - min || 1;
++    const x = (i: number) => PAD_LEFT + (i / (prices.length - 1)) * (WIDTH - PAD_LEFT - PAD_RIGHT);
++    const y = (p: number) => PAD_TOP + (1 - (p - min) / range) * (HEIGHT - PAD_TOP - PAD_BOTTOM);
++    const line = prices.map((p, i) => `${x(i)},${y(p)}`).join(' ');
++    const base = HEIGHT - PAD_BOTTOM;
++    const area = `${x(0)},${base} ${line} ${x(prices.length - 1)},${base}`;
++    const ticks = Array.from({ length: TICKS }, (_, i) => {
++      const idx = Math.round((i / (TICKS - 1)) * (prices.length - 1));
++      return { x: x(idx), label: monthLabel.format(new Date(candles.t[idx] * 1000)) };
++    });
++    return { prices, min, max, x, y, line, area, ticks, base };
++  }, [candles]);
++
++  const { prices, min, max, x, y, line, area, ticks, base } = geometry;
++  const first = prices[0];
++  const last = prices[prices.length - 1];
++  const yearChange = ((last - first) / first) * 100;
++
++  function handlePointer(clientX: number) {
++    const rect = svgRef.current?.getBoundingClientRect();
++    if (!rect) return;
++    const rel = ((clientX - rect.left) / rect.width) * WIDTH;
++    const idx = Math.round(((rel - PAD_LEFT) / (WIDTH - PAD_LEFT - PAD_RIGHT)) * (prices.length - 1));
++    setHover(Math.max(0, Math.min(prices.length - 1, idx)));
++  }
++
++  return (
++    <div className={styles.chart}>
++      <p className={styles.chartChange}>
++        <span className={yearChange >= 0 ? styles.up : styles.down}>
++          {yearChange >= 0 ? '+' : ''}{formatNumber(yearChange, 1)} %
++        </span>{' '}
++        <span className={styles.meta}>in 12 Monaten</span>
++      </p>
++      <svg
++        ref={svgRef}
++        viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
++        role="img"
++        aria-label={`Kursverlauf über ein Jahr, von ${formatNumber(first)} auf ${formatNumber(last)} ${currency}`}
++        onPointerMove={(e) => handlePointer(e.clientX)}
++        onPointerDown={(e) => handlePointer(e.clientX)}
++        onPointerLeave={() => setHover(null)}
++      >
++        <line className={styles.chartGrid} x1={PAD_LEFT} x2={WIDTH - PAD_RIGHT} y1={PAD_TOP} y2={PAD_TOP} />
++        <line className={styles.chartGrid} x1={PAD_LEFT} x2={WIDTH - PAD_RIGHT} y1={(PAD_TOP + base) / 2} y2={(PAD_TOP + base) / 2} />
++        <line className={styles.chartGrid} x1={PAD_LEFT} x2={WIDTH - PAD_RIGHT} y1={base} y2={base} />
++        <polygon className={styles.chartArea} points={area} />
++        <polyline className={styles.chartLine} points={line} />
++        <text className={styles.chartLabel} x={0} y={PAD_TOP + 4}>{formatNumber(max)}</text>
++        <text className={styles.chartLabel} x={0} y={(PAD_TOP + base) / 2 + 4}>{formatNumber((min + max) / 2)}</text>
++        <text className={styles.chartLabel} x={0} y={base + 4}>{formatNumber(min)}</text>
++        {ticks.map((t, i) => (
++          <text
++            key={i}
++            className={styles.chartLabel}
++            x={t.x}
++            y={HEIGHT - 6}
++            textAnchor={i === 0 ? 'start' : i === ticks.length - 1 ? 'end' : 'middle'}
++          >
++            {t.label}
++          </text>
++        ))}
++        {hover !== null && (
++          <>
++            <line className={styles.chartCrosshair} x1={x(hover)} x2={x(hover)} y1={PAD_TOP} y2={base} />
++            <circle className={styles.chartDot} cx={x(hover)} cy={y(prices[hover])} r={4.5} />
++          </>
++        )}
++      </svg>
++      {hover !== null && (
++        <div
++          className={styles.chartTooltip}
++          style={{ left: `${(x(hover) / WIDTH) * 100}%`, top: `${(y(prices[hover]) / HEIGHT) * 100}%` }}
++        >
++          {dayLabel.format(new Date(candles.t[hover] * 1000))}: {formatNumber(prices[hover])} {currency}
++        </div>
++      )}
++    </div>
++  );
++}
+diff --git a/src/components/stocks/StockSearch.tsx b/src/components/stocks/StockSearch.tsx
+new file mode 100644
+index 0000000..24f9ffa
+--- /dev/null
++++ b/src/components/stocks/StockSearch.tsx
+@@ -0,0 +1,80 @@
++'use client';
++
++import { useEffect, useRef, useState } from 'react';
++import { searchSymbols } from '@/lib/stocks/finnhub';
++import type { SymbolSearchResult } from '@/lib/stocks/types';
++import styles from './stocks.module.css';
++
++type SearchState =
++  | { status: 'idle' }
++  | { status: 'loading' }
++  | { status: 'done'; results: SymbolSearchResult[] }
++  | { status: 'error' };
++
++export default function StockSearch({ onAdd }: { onAdd: (symbol: string) => void }) {
++  const [query, setQuery] = useState('');
++  const [state, setState] = useState<SearchState>({ status: 'idle' });
++  const wrapRef = useRef<HTMLDivElement>(null);
++
++  useEffect(() => {
++    function onDocClick(e: MouseEvent) {
++      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setState({ status: 'idle' });
++    }
++    document.addEventListener('mousedown', onDocClick);
++    return () => document.removeEventListener('mousedown', onDocClick);
++  }, []);
++
++  async function handleSubmit(e: React.FormEvent) {
++    e.preventDefault();
++    const q = query.trim();
++    if (!q) return;
++    setState({ status: 'loading' });
++    try {
++      setState({ status: 'done', results: await searchSymbols(q) });
++    } catch {
++      setState({ status: 'error' });
++    }
++  }
++
++  function add(symbol: string) {
++    onAdd(symbol);
++    setQuery('');
++    setState({ status: 'idle' });
++  }
++
++  return (
++    <div className={styles.search} ref={wrapRef}>
++      <form onSubmit={handleSubmit} role="search">
++        <label className={styles.label} htmlFor="stock-search">Aktie suchen</label>
++        <div className={styles.inputRow}>
++          <input
++            id="stock-search"
++            className={styles.input}
++            value={query}
++            onChange={(e) => setQuery(e.target.value)}
++            onKeyDown={(e) => { if (e.key === 'Escape') setState({ status: 'idle' }); }}
++            placeholder="Name oder Symbol, z. B. Siemens oder AAPL"
++            autoComplete="off"
++          />
++          <button type="submit" className={`${styles.btn} ${styles.btnSolid}`}>Suchen</button>
++        </div>
++      </form>
++
++      {state.status !== 'idle' && (
++        <ul className={styles.results}>
++          {state.status === 'loading' && <li className={styles.resultEmpty}>Suche …</li>}
++          {state.status === 'error' && <li className={styles.resultEmpty}>Die Suche hat nicht geklappt. Versuche es gleich noch einmal.</li>}
++          {state.status === 'done' && state.results.length === 0 && <li className={styles.resultEmpty}>Keine Treffer.</li>}
++          {state.status === 'done' && state.results.map((r) => (
++            <li key={r.symbol}>
++              <button type="button" className={styles.resultItem} onClick={() => add(r.symbol)}>
++                <span className={styles.resultSymbol}>{r.symbol}</span>
++                <span className={styles.resultName}>{r.description}</span>
++              </button>
++            </li>
++          ))}
++        </ul>
++      )}
++    </div>
++  );
++}
+diff --git a/src/components/stocks/StocksApp.tsx b/src/components/stocks/StocksApp.tsx
+new file mode 100644
+index 0000000..33cb1df
+--- /dev/null
++++ b/src/components/stocks/StocksApp.tsx
+@@ -0,0 +1,13 @@
++'use client';
++
++import dynamic from 'next/dynamic';
++
++// Key und Watchlist liegen im localStorage; ohne Server-Rendering gibt es keinen Hydration-Unterschied.
++const StocksTerminal = dynamic(() => import('./StocksTerminal'), {
++  ssr: false,
++  loading: () => null,
++});
++
++export default function StocksApp() {
++  return <StocksTerminal />;
++}
+diff --git a/src/components/stocks/StocksTerminal.tsx b/src/components/stocks/StocksTerminal.tsx
+new file mode 100644
+index 0000000..017f563
+--- /dev/null
++++ b/src/components/stocks/StocksTerminal.tsx
+@@ -0,0 +1,202 @@
++'use client';
++
++import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
++import Link from 'next/link';
++import {
++  FinnhubError, clearKeyProblem, fetchNextEarnings, fetchQuote, getKeyProblemState, setActiveApiKey,
++  subscribeKeyProblem,
++} from '@/lib/stocks/finnhub';
++import { loadApiKey, loadWatchlist, saveApiKey, saveWatchlist } from '@/lib/stocks/storage';
++import type { EarningsEvent } from '@/lib/stocks/types';
++import CompanyDetail from './CompanyDetail';
++import EarningsList from './EarningsList';
++import KeyBanner from './KeyBanner';
++import KeySetup from './KeySetup';
++import StockSearch from './StockSearch';
++import WatchlistTable, { type QuoteState } from './WatchlistTable';
++import styles from './stocks.module.css';
++
++const REFRESH_MS = 15_000;
++const timeLabel = new Intl.DateTimeFormat('de-DE', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
++
++/** Läuft nur im Browser (wird mit ssr: false geladen), daher darf der Startzustand aus localStorage kommen. */
++export default function StocksTerminal() {
++  const [apiKey, setApiKey] = useState(() => {
++    const key = loadApiKey();
++    setActiveApiKey(key);
++    return key;
++  });
++  const [showSetup, setShowSetup] = useState(() => !apiKey);
++  const [watchlist, setWatchlist] = useState<string[]>(loadWatchlist);
++  const [quotes, setQuotes] = useState<Record<string, QuoteState>>({});
++  const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
++  const [earnings, setEarnings] = useState<Record<string, EarningsEvent | null>>({});
++  const [selected, setSelected] = useState<string | null>(null);
++  const [dismissedProblemId, setDismissedProblemId] = useState(0);
++
++  const keyProblem = useSyncExternalStore(subscribeKeyProblem, getKeyProblemState, getKeyProblemState);
++  const bannerProblem = keyProblem.problem && keyProblem.id !== dismissedProblemId ? keyProblem.problem : null;
++  const active = Boolean(apiKey) && !showSetup;
++
++  useEffect(() => {
++    saveWatchlist(watchlist);
++  }, [watchlist]);
++
++  const refreshQuotes = useCallback(async (symbols: string[]) => {
++    const results = await Promise.all(
++      symbols.map(async (s): Promise<[string, QuoteState | 'limit']> => {
++        try {
++          return [s, await fetchQuote(s)];
++        } catch (err) {
++          // Bei Limit bleiben die letzten Kurse stehen; die Hinweisleiste erklärt, warum.
++          return [s, err instanceof FinnhubError && err.status === 429 ? 'limit' : 'error'];
++        }
++      })
++    );
++    setQuotes((prev) => {
++      const next = { ...prev };
++      for (const [s, q] of results) if (q !== 'limit') next[s] = q;
++      return next;
++    });
++    if (results.some(([, q]) => q !== 'limit' && q !== 'error')) setLastUpdate(new Date());
++  }, []);
++
++  useEffect(() => {
++    if (!active || watchlist.length === 0) return;
++    // Erster Abruf sofort, danach im Intervall; beides läuft asynchron.
++    const first = setTimeout(() => refreshQuotes(watchlist), 0);
++    const timer = setInterval(() => refreshQuotes(watchlist), REFRESH_MS);
++    return () => {
++      clearTimeout(first);
++      clearInterval(timer);
++    };
++  }, [active, watchlist, apiKey, refreshQuotes]);
++
++  // Termine je Symbol nur einmal abfragen. Fehlversuche werden wieder freigegeben und beim
++  // nächsten Ändern der Watchlist oder nach einem Key-Wechsel erneut versucht, nicht in einer Schleife.
++  const earningsRequested = useRef(new Set<string>());
++
++  useEffect(() => {
++    if (!active) return;
++    const missing = watchlist.filter((s) => !earningsRequested.current.has(s));
++    if (missing.length === 0) return;
++    missing.forEach((s) => earningsRequested.current.add(s));
++    (async () => {
++      const found = await Promise.all(
++        missing.map(async (s) => {
++          try {
++            return [s, await fetchNextEarnings(s)] as const;
++          } catch {
++            earningsRequested.current.delete(s);
++            return null;
++          }
++        })
++      );
++      setEarnings((prev) => {
++        const next = { ...prev };
++        for (const entry of found) if (entry) next[entry[0]] = entry[1];
++        return next;
++      });
++    })();
++  }, [active, watchlist, apiKey]);
++
++  function handleKeySaved(key: string) {
++    saveApiKey(key);
++    setActiveApiKey(key);
++    clearKeyProblem();
++    earningsRequested.current.clear();
++    setApiKey(key);
++    setEarnings({});
++    setShowSetup(false);
++  }
++
++  function openSetup() {
++    setSelected(null);
++    setShowSetup(true);
++  }
++
++  function addSymbol(symbol: string) {
++    setWatchlist((list) => (list.includes(symbol) ? list : [...list, symbol]));
++  }
++
++  function removeSymbol(symbol: string) {
++    setWatchlist((list) => list.filter((s) => s !== symbol));
++  }
++
++  const closeDetail = useCallback(() => setSelected(null), []);
++
++  return (
++    <div className={`${styles.root} ${bannerProblem ? styles.withBanner : ''}`}>
++      <header className={styles.header}>
++        <div className={styles.bar}>
++          <Link href="/" className={styles.brand}>
++            <span className={styles.wordmark}>Parity</span>
++            <span className={styles.brandSub}>Terminal · Aktien</span>
++          </Link>
++          <nav className={styles.nav} aria-label="Aktien">
++            <Link href="/" className={styles.navlink}>← Zur Karte</Link>
++            {apiKey && !showSetup && (
++              <button type="button" className={styles.navlink} onClick={openSetup}>API-Key ändern</button>
++            )}
++          </nav>
++        </div>
++      </header>
++
++      {showSetup ? (
++        <KeySetup isChange={Boolean(apiKey)} onSaved={handleKeySaved} onCancel={apiKey ? () => setShowSetup(false) : undefined} />
++      ) : (
++        <>
++          <section className={`${styles.section} ${styles.sectionTight}`}>
++            <div className={styles.inner}>
++              <p className={styles.eyebrow}>Mitglieder-Terminal · Märkte</p>
++              <h1 className={styles.title}>Aktien</h1>
++              <p className={styles.lead}>
++                Live-Kurse deiner Watchlist, Firmenprofile mit Finanzkennzahlen, Analysten-Einschätzungen,
++                Konkurrenzvergleich und die nächsten Quartalszahlen.
++              </p>
++              <StockSearch onAdd={addSymbol} />
++            </div>
++          </section>
++
++          <section className={`${styles.section} ${styles.sectionTight}`}>
++            <div className={styles.inner}>
++              <div className={styles.sectionHead}>
++                <h2 className={styles.h2}>Watchlist</h2>
++                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
++                  {lastUpdate && <span className={`${styles.meta} ${styles.num}`}>Stand {timeLabel.format(lastUpdate)}</span>}
++                  <button type="button" className={`${styles.btn} ${styles.btnSm}`} onClick={() => refreshQuotes(watchlist)}>
++                    Aktualisieren
++                  </button>
++                </div>
++              </div>
++              <WatchlistTable symbols={watchlist} quotes={quotes} onOpen={setSelected} onRemove={removeSymbol} />
++            </div>
++          </section>
++
++          <section className={`${styles.section} ${styles.paper}`}>
++            <div className={styles.inner}>
++              <p className={styles.eyebrow}>Kalender</p>
++              <h2 className={styles.h2} style={{ marginBottom: 28 }}>Nächste Quartalszahlen</h2>
++              <EarningsList symbols={watchlist} earnings={earnings} onOpen={setSelected} />
++            </div>
++          </section>
++        </>
++      )}
++
++      <footer className={styles.footer}>
++        <div className={styles.footInner}>
++          <span>Daten von Finnhub mit deinem eigenen API-Key. Keine Anlageberatung.</span>
++          {apiKey && !showSetup && (
++            <button type="button" className={`${styles.btn} ${styles.btnSm}`} onClick={openSetup}>API-Key ändern</button>
++          )}
++        </div>
++      </footer>
++
++      {selected && active && <CompanyDetail key={selected} symbol={selected} onClose={closeDetail} />}
++
++      {bannerProblem && active && (
++        <KeyBanner problem={bannerProblem} onChangeKey={openSetup} onDismiss={() => setDismissedProblemId(keyProblem.id)} />
++      )}
++    </div>
++  );
++}
+diff --git a/src/components/stocks/WatchlistTable.tsx b/src/components/stocks/WatchlistTable.tsx
+new file mode 100644
+index 0000000..4dbc576
+--- /dev/null
++++ b/src/components/stocks/WatchlistTable.tsx
+@@ -0,0 +1,90 @@
++'use client';
++
++import type { Quote } from '@/lib/stocks/types';
++import { formatNumber } from '@/lib/stocks/financials';
++import styles from './stocks.module.css';
++
++/** `undefined` = noch nicht geladen, `'error'` = Abruf fehlgeschlagen. */
++export type QuoteState = Quote | 'error' | undefined;
++
++interface WatchlistTableProps {
++  symbols: string[];
++  quotes: Record<string, QuoteState>;
++  onOpen: (symbol: string) => void;
++  onRemove: (symbol: string) => void;
++}
++
++function Change({ value, suffix = '' }: { value: number | null | undefined; suffix?: string }) {
++  if (typeof value !== 'number') return <>–</>;
++  return (
++    <span className={value >= 0 ? styles.up : styles.down}>
++      {value >= 0 ? '+' : ''}{formatNumber(value)}{suffix}
++    </span>
++  );
++}
++
++export default function WatchlistTable({ symbols, quotes, onOpen, onRemove }: WatchlistTableProps) {
++  if (symbols.length === 0) {
++    return <p className={styles.empty}>Noch keine Aktien in der Watchlist. Suche oben nach einer Aktie und füge sie hinzu.</p>;
++  }
++
++  return (
++    <>
++      <div className={styles.tableScroll}>
++        <table className={styles.table}>
++          <thead>
++            <tr>
++              <th scope="col">Symbol</th>
++              <th scope="col">Kurs</th>
++              <th scope="col">Änderung</th>
++              <th scope="col">Änderung %</th>
++              <th scope="col">Eröffnung</th>
++              <th scope="col">Tageshoch</th>
++              <th scope="col">Tagestief</th>
++              <th scope="col">Vortag</th>
++              <th scope="col"><span className="sr-only">Entfernen</span></th>
++            </tr>
++          </thead>
++          <tbody>
++            {symbols.map((symbol) => {
++              const q = quotes[symbol];
++              const quote = q && q !== 'error' && !(q.c === 0 && q.pc === 0) ? q : null;
++              const placeholder = q === 'error' ? 'Fehler' : q ? 'n/v' : '…';
++              return (
++                <tr key={symbol} className={styles.rowLink} onClick={() => onOpen(symbol)} data-symbol={symbol}>
++                  <td>
++                    <button
++                      type="button"
++                      className={styles.symbolButton}
++                      onClick={(e) => { e.stopPropagation(); onOpen(symbol); }}
++                    >
++                      {symbol}
++                    </button>
++                  </td>
++                  <td data-field="price">{quote ? formatNumber(quote.c) : placeholder}</td>
++                  <td><Change value={quote?.d} /></td>
++                  <td><Change value={quote?.dp} suffix=" %" /></td>
++                  <td>{quote ? formatNumber(quote.o) : '–'}</td>
++                  <td>{quote ? formatNumber(quote.h) : '–'}</td>
++                  <td>{quote ? formatNumber(quote.l) : '–'}</td>
++                  <td>{quote ? formatNumber(quote.pc) : '–'}</td>
++                  <td>
++                    <button
++                      type="button"
++                      className={styles.removeButton}
++                      onClick={(e) => { e.stopPropagation(); onRemove(symbol); }}
++                      aria-label={`${symbol} aus der Watchlist entfernen`}
++                    >
++                      ×
++                    </button>
++                  </td>
++                </tr>
++              );
++            })}
++          </tbody>
++        </table>
++      </div>
++      <p className={styles.hint}>Tippe auf eine Aktie für Firmenprofil, Kennzahlen, Analysten und Nachrichten.</p>
++    </>
++  );
++}
+diff --git a/src/components/stocks/stocks.module.css b/src/components/stocks/stocks.module.css
+new file mode 100644
+index 0000000..8bf54aa
+--- /dev/null
++++ b/src/components/stocks/stocks.module.css
+@@ -0,0 +1,1024 @@
++/* Aktienansicht im Parity-Design (abgeleitet von parity-design.css).
++   Als CSS-Modul, damit Element-Regeln wie section/header/body nicht die Karte im Terminal verändern. */
++
++.root {
++  --blue: #013479;
++  --blue-deep: #012a61;
++  --white: #ffffff;
++  --paper: #f3f4f6;
++  --rule: rgba(1, 52, 121, 0.16);
++  --rule-light: rgba(255, 255, 255, 0.24);
++  --muted: rgba(1, 52, 121, 0.68);
++  --muted-light: rgba(255, 255, 255, 0.72);
++  --serif: 'Tinos', 'FreeSerif', 'Times New Roman', Times, serif;
++  --sans: 'Archivo', 'Helvetica Neue', Helvetica, Arial, sans-serif;
++  --pad: clamp(16px, 6vw, 110px);
++
++  /* Funktionsfarben (nicht Marke): Kursbewegung und Analysten-Skala */
++  --up: #1e7b34;
++  --down: #c5221f;
++  --rating-strong-buy: #1e7b34;
++  --rating-buy: #7cc08a;
++  --rating-hold: #b8bfcb;
++  --rating-sell: #ee9a94;
++  --rating-strong-sell: #c5221f;
++
++  position: fixed;
++  inset: 0;
++  overflow-y: auto;
++  background: var(--white);
++  color: var(--blue);
++  font-family: var(--sans);
++  font-size: 16px;
++  line-height: 1.6;
++  -webkit-font-smoothing: antialiased;
++  color-scheme: light;
++}
++
++/* Das Terminal setzt global lange Farbübergänge; hier gelten die kurzen aus dem Parity-Design. */
++.root *,
++.root *::before,
++.root *::after {
++  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
++}
++
++/* :where() hält diese Grundregeln auf Element-Spezifität, damit Klassen wie .title ihre Abstände behalten. */
++:where(.root) h1,
++:where(.root) h2,
++:where(.root) h3 {
++  font-family: var(--serif);
++  font-weight: 400;
++  margin: 0;
++  letter-spacing: -0.005em;
++  text-wrap: balance;
++}
++
++:where(.root) p {
++  margin: 0 0 1em;
++}
++
++:where(.root) a {
++  color: inherit;
++}
++
++.root a:focus-visible,
++.root button:focus-visible {
++  outline: 2px solid currentColor;
++  outline-offset: 3px;
++}
++
++.num {
++  font-variant-numeric: tabular-nums;
++}
++
++/* ---------- Header ---------- */
++
++.header {
++  position: sticky;
++  top: 0;
++  z-index: 20;
++  background: var(--white);
++  border-bottom: 1px solid var(--rule);
++}
++
++.bar {
++  display: flex;
++  align-items: center;
++  justify-content: space-between;
++  flex-wrap: wrap;
++  gap: 12px 24px;
++  padding: 18px var(--pad);
++  padding-top: calc(18px + env(safe-area-inset-top, 0px));
++}
++
++.brand {
++  display: flex;
++  align-items: baseline;
++  gap: 12px;
++  text-decoration: none;
++}
++
++.wordmark {
++  font-family: var(--serif);
++  text-transform: uppercase;
++  letter-spacing: 0.16em;
++  text-indent: 0.16em;
++  font-size: 1.02rem;
++  line-height: 1;
++  white-space: nowrap;
++}
++
++.brandSub {
++  font-size: 0.72rem;
++  text-transform: uppercase;
++  letter-spacing: 0.09em;
++  color: var(--muted);
++}
++
++.nav {
++  display: flex;
++  align-items: center;
++  gap: 22px;
++}
++
++.navlink {
++  font-size: 0.78rem;
++  text-transform: uppercase;
++  letter-spacing: 0.09em;
++  font-weight: 500;
++  text-decoration: none;
++  padding: 4px 0;
++  border: 0;
++  border-bottom: 1px solid transparent;
++  background: none;
++  color: inherit;
++  font-family: inherit;
++  cursor: pointer;
++}
++
++.navlink:hover {
++  border-bottom-color: var(--blue);
++}
++
++/* ---------- Sektionen ---------- */
++
++.section {
++  padding: clamp(40px, 7vw, 96px) var(--pad);
++}
++
++.sectionTight {
++  padding-top: clamp(28px, 4vw, 56px);
++}
++
++.paper {
++  background: var(--paper);
++}
++
++.inner {
++  max-width: 1100px;
++  margin: 0 auto;
++}
++
++.eyebrow {
++  font-size: 0.72rem;
++  text-transform: uppercase;
++  letter-spacing: 0.13em;
++  font-weight: 600;
++  margin: 0 0 18px;
++  color: var(--muted);
++}
++
++.title {
++  font-size: clamp(2.2rem, 5vw, 3.6rem);
++  line-height: 1.05;
++  margin-bottom: 18px;
++}
++
++.h2 {
++  font-size: clamp(1.6rem, 3vw, 2.4rem);
++  line-height: 1.14;
++}
++
++.lead {
++  color: var(--muted);
++  max-width: 62ch;
++  font-size: 1.05rem;
++}
++
++.sectionHead {
++  display: flex;
++  align-items: flex-end;
++  justify-content: space-between;
++  flex-wrap: wrap;
++  gap: 12px 24px;
++  margin-bottom: 24px;
++}
++
++.meta {
++  font-size: 0.82rem;
++  color: var(--muted);
++}
++
++/* ---------- Buttons ---------- */
++
++.btn {
++  display: inline-block;
++  font-family: var(--sans);
++  font-size: 0.76rem;
++  font-weight: 500;
++  text-transform: uppercase;
++  letter-spacing: 0.11em;
++  padding: 15px 30px;
++  text-decoration: none;
++  border: 1px solid var(--blue);
++  border-radius: 0;
++  background: transparent;
++  color: var(--blue);
++  cursor: pointer;
++  white-space: nowrap;
++}
++
++.btn:hover {
++  background: var(--blue);
++  color: var(--white);
++}
++
++.btn:disabled {
++  opacity: 0.55;
++  cursor: wait;
++}
++
++.btnSolid {
++  background: var(--blue);
++  color: var(--white);
++}
++
++.btnSolid:hover {
++  background: var(--blue-deep);
++}
++
++.btnOnBlue {
++  border-color: var(--white);
++  color: var(--white);
++}
++
++.btnOnBlue:hover {
++  background: var(--white);
++  color: var(--blue);
++}
++
++.btnSm {
++  padding: 11px 22px;
++  font-size: 0.72rem;
++}
++
++/* ---------- Badges ---------- */
++
++.badges {
++  display: flex;
++  flex-wrap: wrap;
++  gap: 6px;
++}
++
++.badge {
++  font-size: 0.68rem;
++  text-transform: uppercase;
++  letter-spacing: 0.12em;
++  font-weight: 600;
++  border: 1px solid var(--rule);
++  padding: 6px 11px;
++  white-space: nowrap;
++  color: var(--muted);
++}
++
++.badgeActive {
++  border-color: var(--blue);
++  background: var(--blue);
++  color: var(--white);
++}
++
++/* ---------- Formulare ---------- */
++
++.label {
++  display: block;
++  font-size: 0.72rem;
++  text-transform: uppercase;
++  letter-spacing: 0.13em;
++  font-weight: 600;
++  color: var(--muted);
++  margin-bottom: 10px;
++}
++
++.input {
++  width: 100%;
++  min-width: 0;
++  font-family: var(--sans);
++  font-size: 1rem;
++  color: var(--blue);
++  background: var(--white);
++  border: 1px solid var(--rule);
++  border-radius: 0;
++  padding: 14px 16px;
++  line-height: 1.6;
++}
++
++.input::placeholder {
++  color: rgba(1, 52, 121, 0.4);
++}
++
++.input:focus {
++  outline: none;
++  border-color: var(--blue);
++  box-shadow: inset 0 0 0 1px var(--blue);
++}
++
++.inputRow {
++  display: flex;
++  gap: 8px;
++}
++
++.error {
++  color: var(--down);
++  font-size: 0.9rem;
++  min-height: 1.5em;
++  margin: 10px 0 0;
++}
++
++/* ---------- Einrichtung ---------- */
++
++.setup {
++  max-width: 760px;
++}
++
++.steps {
++  list-style: none;
++  counter-reset: step;
++  margin: 36px 0 40px;
++  padding: 0;
++  display: grid;
++  grid-template-columns: repeat(2, minmax(0, 1fr));
++  gap: 32px 28px;
++}
++
++.step {
++  counter-increment: step;
++  border-top: 2px solid var(--blue);
++  padding-top: 18px;
++}
++
++.step::before {
++  content: counter(step, decimal-leading-zero);
++  display: block;
++  font-family: var(--serif);
++  font-size: 1.6rem;
++  line-height: 1;
++  margin-bottom: 10px;
++}
++
++.step h3 {
++  font-size: 1.2rem;
++  margin-bottom: 6px;
++}
++
++.step p {
++  color: var(--muted);
++  font-size: 0.95rem;
++  margin-bottom: 8px;
++}
++
++.stepLink {
++  font-size: 0.78rem;
++  text-transform: uppercase;
++  letter-spacing: 0.09em;
++  font-weight: 500;
++}
++
++.setupForm {
++  border-top: 1px solid var(--rule);
++  padding-top: 28px;
++}
++
++.setupActions {
++  display: flex;
++  flex-wrap: wrap;
++  gap: 8px;
++  margin-top: 12px;
++}
++
++.note {
++  margin-top: 24px;
++  font-size: 0.88rem;
++  color: var(--muted);
++}
++
++@media (max-width: 640px) {
++  .steps {
++    grid-template-columns: 1fr;
++  }
++}
++
++/* ---------- Suche ---------- */
++
++.search {
++  position: relative;
++  max-width: 640px;
++  margin-top: 28px;
++}
++
++.results {
++  position: absolute;
++  z-index: 15;
++  left: 0;
++  right: 0;
++  top: 100%;
++  margin: 4px 0 0;
++  padding: 0;
++  list-style: none;
++  background: var(--white);
++  border: 1px solid var(--blue);
++  max-height: 300px;
++  overflow-y: auto;
++}
++
++.resultItem {
++  display: flex;
++  justify-content: space-between;
++  gap: 16px;
++  width: 100%;
++  padding: 12px 16px;
++  border: 0;
++  border-bottom: 1px solid var(--rule);
++  background: none;
++  color: inherit;
++  font: inherit;
++  text-align: left;
++  cursor: pointer;
++}
++
++.resultItem:hover {
++  background: var(--paper);
++}
++
++.resultSymbol {
++  font-weight: 600;
++}
++
++.resultName {
++  color: var(--muted);
++  text-align: right;
++  overflow-wrap: anywhere;
++}
++
++.resultEmpty {
++  padding: 12px 16px;
++  color: var(--muted);
++}
++
++/* ---------- Tabellen ---------- */
++
++/* position: relative hält absolut positionierte Kinder (z. B. sr-only-Text) im Scrollbereich. */
++.tableScroll {
++  position: relative;
++  overflow-x: auto;
++}
++
++.table {
++  width: 100%;
++  border-collapse: collapse;
++  font-variant-numeric: tabular-nums;
++}
++
++.table th,
++.table td {
++  padding: 14px 12px;
++  text-align: right;
++  border-bottom: 1px solid var(--rule);
++  white-space: nowrap;
++}
++
++.table th:first-child,
++.table td:first-child {
++  text-align: left;
++  padding-left: 0;
++}
++
++.table th {
++  font-size: 0.68rem;
++  text-transform: uppercase;
++  letter-spacing: 0.12em;
++  font-weight: 600;
++  color: var(--muted);
++  border-bottom-color: var(--blue);
++}
++
++.rowLink {
++  cursor: pointer;
++}
++
++.rowLink:hover td {
++  background: var(--paper);
++}
++
++.symbolCell {
++  font-weight: 600;
++}
++
++.symbolButton {
++  border: 0;
++  background: none;
++  padding: 0;
++  color: inherit;
++  font: inherit;
++  font-weight: 600;
++  cursor: pointer;
++  text-decoration: underline;
++  text-decoration-color: var(--rule);
++  text-underline-offset: 4px;
++}
++
++.removeButton {
++  border: 0;
++  background: none;
++  color: var(--muted);
++  font-size: 1.15rem;
++  line-height: 1;
++  padding: 2px 6px;
++  cursor: pointer;
++}
++
++.removeButton:hover {
++  color: var(--down);
++}
++
++.up {
++  color: var(--up);
++}
++
++.down {
++  color: var(--down);
++}
++
++.hint {
++  font-size: 0.82rem;
++  color: var(--muted);
++  margin-top: 14px;
++}
++
++.empty {
++  border-top: 2px solid var(--blue);
++  padding-top: 18px;
++  color: var(--muted);
++}
++
++/* ---------- Quartalszahlen ---------- */
++
++.earnings {
++  list-style: none;
++  margin: 0;
++  padding: 0;
++  display: grid;
++  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
++  gap: 28px;
++}
++
++.earningsCard {
++  border-top: 2px solid var(--blue);
++  padding-top: 16px;
++}
++
++.earningsDate {
++  font-family: var(--serif);
++  font-size: 1.45rem;
++  line-height: 1.15;
++}
++
++.earningsWhen {
++  font-size: 0.72rem;
++  text-transform: uppercase;
++  letter-spacing: 0.12em;
++  font-weight: 600;
++  color: var(--muted);
++  margin: 4px 0 12px;
++}
++
++.earningsDetail {
++  font-size: 0.88rem;
++  color: var(--muted);
++}
++
++/* ---------- Footer ---------- */
++
++.footer {
++  padding: clamp(36px, 5vw, 64px) var(--pad) calc(36px + env(safe-area-inset-bottom, 0px));
++  border-top: 1px solid var(--rule);
++}
++
++.footInner {
++  max-width: 1100px;
++  margin: 0 auto;
++  display: flex;
++  flex-wrap: wrap;
++  align-items: center;
++  justify-content: space-between;
++  gap: 16px 24px;
++  font-size: 0.85rem;
++  color: var(--muted);
++}
++
++.withBanner {
++  padding-bottom: 160px;
++}
++
++/* ---------- Hinweisleiste (blaues Band) ---------- */
++
++.banner {
++  position: fixed;
++  left: 0;
++  right: 0;
++  bottom: 0;
++  z-index: 40;
++  background: var(--blue);
++  color: var(--white);
++  padding: 18px var(--pad) calc(18px + env(safe-area-inset-bottom, 0px));
++}
++
++.bannerInner {
++  max-width: 1100px;
++  margin: 0 auto;
++  display: flex;
++  flex-wrap: wrap;
++  align-items: center;
++  justify-content: space-between;
++  gap: 14px 24px;
++}
++
++.bannerText {
++  margin: 0;
++  color: var(--muted-light);
++  max-width: 70ch;
++}
++
++.bannerText strong {
++  color: var(--white);
++  font-weight: 600;
++}
++
++.bannerActions {
++  display: flex;
++  align-items: center;
++  gap: 8px;
++}
++
++.bannerClose {
++  border: 0;
++  background: none;
++  color: var(--muted-light);
++  font-size: 1.4rem;
++  line-height: 1;
++  padding: 6px 10px;
++  cursor: pointer;
++}
++
++.bannerClose:hover {
++  color: var(--white);
++}
++
++/* ---------- Firmenprofil ---------- */
++
++.overlay {
++  position: fixed;
++  inset: 0;
++  z-index: 30;
++  background: rgba(1, 42, 97, 0.35);
++  display: flex;
++  justify-content: flex-end;
++}
++
++.panel {
++  position: relative;
++  width: min(760px, 100%);
++  height: 100%;
++  overflow-y: auto;
++  background: var(--white);
++  border-left: 1px solid var(--rule);
++  padding: calc(28px + env(safe-area-inset-top, 0px)) clamp(16px, 4vw, 48px) calc(48px + env(safe-area-inset-bottom, 0px));
++}
++
++.close {
++  position: absolute;
++  top: calc(16px + env(safe-area-inset-top, 0px));
++  right: clamp(12px, 3vw, 32px);
++}
++
++.profileHead {
++  display: flex;
++  gap: 18px;
++  align-items: center;
++  margin: 8px 0 18px;
++  padding-right: 110px;
++}
++
++.logo {
++  width: 52px;
++  height: 52px;
++  object-fit: contain;
++  border: 1px solid var(--rule);
++  padding: 6px;
++  background: var(--white);
++  flex: none;
++}
++
++.profileName {
++  font-size: clamp(1.7rem, 3.4vw, 2.4rem);
++  line-height: 1.1;
++}
++
++.priceLine {
++  display: flex;
++  align-items: baseline;
++  flex-wrap: wrap;
++  gap: 6px 14px;
++  margin: 20px 0 6px;
++}
++
++.price {
++  font-family: var(--serif);
++  font-size: 2.2rem;
++  line-height: 1;
++}
++
++.block {
++  border-top: 1px solid var(--rule);
++  padding-top: 22px;
++  margin-top: 30px;
++}
++
++.facts {
++  display: grid;
++  grid-template-columns: repeat(3, minmax(0, 1fr));
++  gap: 18px 24px;
++  margin: 0;
++}
++
++.facts dt {
++  font-size: 0.68rem;
++  text-transform: uppercase;
++  letter-spacing: 0.12em;
++  font-weight: 600;
++  color: var(--muted);
++  margin-bottom: 2px;
++}
++
++.facts dd {
++  margin: 0;
++  overflow-wrap: anywhere;
++}
++
++.metricGroup + .metricGroup {
++  margin-top: 26px;
++}
++
++.metricGroupTitle {
++  font-family: var(--serif);
++  font-size: 1.2rem;
++  margin-bottom: 12px;
++}
++
++.metricGrid {
++  display: grid;
++  grid-template-columns: repeat(3, minmax(0, 1fr));
++  gap: 20px 24px;
++}
++
++.metric {
++  border-top: 2px solid var(--blue);
++  padding-top: 10px;
++  min-width: 0;
++}
++
++.metricLabel {
++  display: block;
++  font-size: 0.66rem;
++  text-transform: uppercase;
++  letter-spacing: 0.12em;
++  font-weight: 600;
++  color: var(--muted);
++}
++
++.metricValue {
++  display: block;
++  font-family: var(--serif);
++  font-size: 1.45rem;
++  line-height: 1.25;
++  font-variant-numeric: tabular-nums;
++  overflow-wrap: anywhere;
++}
++
++.metricHint {
++  display: block;
++  font-size: 0.78rem;
++  color: var(--muted);
++}
++
++.dataNote {
++  color: var(--muted);
++  font-size: 0.92rem;
++  margin: 0;
++}
++
++@media (max-width: 560px) {
++  .facts,
++  .metricGrid {
++    grid-template-columns: repeat(2, minmax(0, 1fr));
++  }
++
++  .profileHead {
++    padding-right: 0;
++    margin-top: 48px;
++  }
++}
++
++/* Analysten */
++
++.ratingSummary {
++  font-size: 1.05rem;
++  margin-bottom: 12px;
++}
++
++.ratingSummary strong {
++  font-family: var(--serif);
++  font-size: 1.6rem;
++  font-weight: 400;
++  margin-right: 6px;
++}
++
++.ratingBar {
++  display: flex;
++  gap: 2px;
++  height: 16px;
++}
++
++.ratingSeg {
++  flex-basis: 0;
++  min-width: 4px;
++}
++
++.segStrongBuy { background: var(--rating-strong-buy); }
++.segBuy { background: var(--rating-buy); }
++.segHold { background: var(--rating-hold); }
++.segSell { background: var(--rating-sell); }
++.segStrongSell { background: var(--rating-strong-sell); }
++
++.ratingLegend {
++  display: flex;
++  flex-wrap: wrap;
++  gap: 8px 18px;
++  margin: 12px 0 0;
++  padding: 0;
++  list-style: none;
++  font-size: 0.85rem;
++  color: var(--muted);
++}
++
++.ratingLegend li {
++  display: inline-flex;
++  align-items: center;
++  gap: 6px;
++}
++
++.ratingLegend strong {
++  color: var(--blue);
++  font-weight: 600;
++}
++
++.swatch {
++  width: 10px;
++  height: 10px;
++  flex: none;
++}
++
++/* Peers */
++
++.peerCurrent td {
++  background: var(--paper);
++  font-weight: 600;
++}
++
++/* News */
++
++.news {
++  list-style: none;
++  margin: 0;
++  padding: 0;
++}
++
++.newsItem {
++  padding: 14px 0;
++  border-bottom: 1px solid var(--rule);
++}
++
++.newsItem:first-child {
++  padding-top: 0;
++}
++
++.newsMeta {
++  font-size: 0.68rem;
++  text-transform: uppercase;
++  letter-spacing: 0.12em;
++  font-weight: 600;
++  color: var(--muted);
++  margin-bottom: 4px;
++}
++
++.newsLink {
++  font-family: var(--serif);
++  font-size: 1.15rem;
++  line-height: 1.35;
++  text-decoration: none;
++}
++
++.newsLink:hover {
++  text-decoration: underline;
++  text-underline-offset: 3px;
++}
++
++/* Management */
++
++.execs {
++  list-style: none;
++  margin: 0;
++  padding: 0;
++}
++
++.execs li {
++  display: flex;
++  justify-content: space-between;
++  gap: 16px;
++  padding: 10px 0;
++  border-bottom: 1px solid var(--rule);
++}
++
++.execTitle {
++  color: var(--muted);
++  text-align: right;
++}
++
++/* Chart */
++
++.chart {
++  position: relative;
++}
++
++.chart svg {
++  display: block;
++  width: 100%;
++  height: auto;
++  overflow: visible;
++  touch-action: pan-y;
++}
++
++.chartLine {
++  fill: none;
++  stroke: var(--blue);
++  stroke-width: 2;
++  stroke-linecap: round;
++  stroke-linejoin: round;
++}
++
++.chartArea {
++  fill: rgba(1, 52, 121, 0.07);
++}
++
++.chartGrid {
++  stroke: var(--rule);
++  stroke-width: 1;
++}
++
++.chartLabel {
++  fill: var(--muted);
++  font-family: var(--sans);
++  font-size: 11px;
++}
++
++.chartCrosshair {
++  stroke: var(--blue);
++  stroke-width: 1;
++  stroke-dasharray: 3 3;
++}
++
++.chartDot {
++  fill: var(--blue);
++  stroke: var(--white);
++  stroke-width: 2;
++}
++
++.chartTooltip {
++  position: absolute;
++  pointer-events: none;
++  transform: translate(-50%, calc(-100% - 12px));
++  background: var(--blue);
++  color: var(--white);
++  font-size: 0.8rem;
++  padding: 6px 10px;
++  white-space: nowrap;
++}
++
++.chartChange {
++  font-size: 0.9rem;
++  margin: 0 0 12px;
++}
++
++/* Laden */
++
++.loading {
++  color: var(--muted);
++  padding: 40px 0;
++}
++
++@media (prefers-reduced-motion: reduce) {
++  .root *,
++  .root *::before,
++  .root *::after {
++    transition: none;
++  }
++}
+diff --git a/src/lib/stocks/financials.test.ts b/src/lib/stocks/financials.test.ts
+new file mode 100644
+index 0000000..60b95d2
+--- /dev/null
++++ b/src/lib/stocks/financials.test.ts
+@@ -0,0 +1,81 @@
++import { describe, it, expect } from 'vitest';
++import {
++  buildFinancials, daysUntil, formatMultiple, formatPercent, formatUsdMillions, pick,
++  relativeDayLabel, safeUrl, summarizeRecommendation,
++} from './financials';
++
++const values = (tiles: { label: string; value: string }[]) => Object.fromEntries(tiles.map((t) => [t.label, t.value]));
++
++describe('buildFinancials', () => {
++  const metric = {
++    peTTM: 35.2, psTTM: 9.1, pbQuarterly: 52.3, revenuePerShareTTM: 25.5, ebitdPerShareTTM: 8.6,
++    epsTTM: 6.4, enterpriseValue: 3_500_000, grossMarginTTM: 46.2, operatingMarginTTM: 31.5,
++    netProfitMarginTTM: 24.3, roeTTM: 150.1, revenueGrowthTTMYoy: 4.9, dividendYieldIndicatedAnnual: 0.45,
++  };
++
++  it('derives totals, margins and EV multiples from per-share values', () => {
++    const f = buildFinancials(metric, { shareOutstanding: 15_000 });
++    expect(values(f.valuation)).toEqual({
++      'KGV (P/E)': '35,2x', 'KUV (P/S)': '9,1x', 'KBV (P/B)': '52,3x', 'EV / EBITDA': '27,1x', 'EV / Umsatz': '9,2x',
++    });
++    expect(values(f.profitability)['EBITDA-Marge']).toBe('33,7 %');
++    expect(values(f.absolute)).toMatchObject({
++      Umsatz: '382,50 Mrd. USD', EBITDA: '129,00 Mrd. USD', Nettogewinn: '96,00 Mrd. USD',
++      'Gewinn je Aktie': '6,40 USD', Dividendenrendite: '0,45 %',
++    });
++  });
++
++  it('prefers reported EV multiples over computed ones', () => {
++    const f = buildFinancials({ ...metric, evEbitdaTTM: 20 }, { shareOutstanding: 15_000 });
++    const tile = f.valuation.find((t) => t.label === 'EV / EBITDA')!;
++    expect(tile.value).toBe('20,0x');
++    expect(tile.hint).not.toBe('berechnet');
++  });
++
++  it('shows dashes instead of wrong numbers when inputs are missing', () => {
++    const f = buildFinancials({ peTTM: -12 }, { shareOutstanding: undefined });
++    expect(values(f.valuation)['KGV (P/E)']).toBe('neg.');
++    expect(values(f.valuation)['EV / EBITDA']).toBe('–');
++    expect(values(f.profitability)['EBITDA-Marge']).toBe('–');
++    expect(values(f.absolute).Umsatz).toBe('–');
++  });
++});
++
++describe('formatters', () => {
++  it('formats money, multiples and percentages the German way', () => {
++    expect(formatUsdMillions(3_520_000)).toBe('3,52 Bio. USD');
++    expect(formatUsdMillions(-950)).toBe('-950 Mio. USD');
++    expect(formatMultiple(null)).toBe('–');
++    expect(formatPercent(-8)).toBe('-8,0 %');
++  });
++
++  it('pick ignores non-numeric and non-finite values', () => {
++    expect(pick({ a: 'x', b: Number.NaN, c: 4 }, ['a', 'b', 'c'])).toBe(4);
++    expect(pick({}, ['a'])).toBeNull();
++  });
++});
++
++describe('summarizeRecommendation', () => {
++  it('computes the share of buy ratings', () => {
++    expect(summarizeRecommendation({ period: '2026-09-01', strongBuy: 12, buy: 20, hold: 8, sell: 2, strongSell: 1 }))
++      .toEqual({ total: 43, bullishPercent: 74 });
++  });
++
++  it('returns null when nobody rated the stock', () => {
++    expect(summarizeRecommendation({ period: '2026-09-01', strongBuy: 0, buy: 0, hold: 0, sell: 0, strongSell: 0 })).toBeNull();
++  });
++});
++
++describe('dates and urls', () => {
++  it('counts calendar days in local time', () => {
++    expect(daysUntil(new Date(2026, 9, 14, 1), new Date(2026, 9, 2, 23))).toBe(12);
++    expect(relativeDayLabel(0)).toBe('heute');
++    expect(relativeDayLabel(1)).toBe('morgen');
++  });
++
++  it('only allows http(s) links', () => {
++    expect(safeUrl('https://example.com/a')).toBe('https://example.com/a');
++    expect(safeUrl('javascript:alert(1)')).toBeNull();
++    expect(safeUrl('')).toBeNull();
++  });
++});
+diff --git a/src/lib/stocks/financials.ts b/src/lib/stocks/financials.ts
+new file mode 100644
+index 0000000..4dd385b
+--- /dev/null
++++ b/src/lib/stocks/financials.ts
+@@ -0,0 +1,173 @@
++/**
++ * Kennzahlen und Formatierung für die Aktienansicht (rein, ohne Browser-APIs).
++ */
++
++import type { CompanyProfile, Metrics, Recommendation } from './types';
++
++const NUMBER_FORMATS = new Map<number, Intl.NumberFormat>();
++
++export function formatNumber(value: number | null | undefined, digits = 2): string {
++  if (typeof value !== 'number' || !Number.isFinite(value)) return '–';
++  let fmt = NUMBER_FORMATS.get(digits);
++  if (!fmt) {
++    fmt = new Intl.NumberFormat('de-DE', { minimumFractionDigits: digits, maximumFractionDigits: digits });
++    NUMBER_FORMATS.set(digits, fmt);
++  }
++  return fmt.format(value);
++}
++
++export function formatUsdMillions(millions: number | null | undefined): string {
++  if (typeof millions !== 'number' || !Number.isFinite(millions)) return '–';
++  const sign = millions < 0 ? '-' : '';
++  const abs = Math.abs(millions);
++  if (abs >= 1_000_000) return `${sign}${formatNumber(abs / 1_000_000)} Bio. USD`;
++  if (abs >= 1_000) return `${sign}${formatNumber(abs / 1_000)} Mrd. USD`;
++  return `${sign}${formatNumber(abs, 0)} Mio. USD`;
++}
++
++export function formatMultiple(value: number | null): string {
++  if (value === null) return '–';
++  if (value < 0) return 'neg.';
++  return `${formatNumber(value, 1)}x`;
++}
++
++export function formatPercent(value: number | null): string {
++  if (value === null) return '–';
++  return `${formatNumber(value, Math.abs(value) < 1 ? 2 : 1)} %`;
++}
++
++/** Finnhub-Feldnamen variieren je nach Symbol; der erste vorhandene Zahlenwert gewinnt. */
++export function pick(metric: Metrics, keys: string[]): number | null {
++  for (const key of keys) {
++    const v = metric[key];
++    if (typeof v === 'number' && Number.isFinite(v)) return v;
++  }
++  return null;
++}
++
++export const METRIC_KEYS = {
++  pe: ['peTTM', 'peBasicExclExtraTTM', 'peNormalizedAnnual', 'peAnnual'],
++  ps: ['psTTM', 'psAnnual'],
++  pb: ['pbQuarterly', 'pbAnnual', 'pb'],
++  evEbitda: ['evEbitdaTTM', 'ev/ebitdaTTM', 'currentEv/ebitdaTTM'],
++  evRevenue: ['evRevenueTTM', 'ev/revenueTTM', 'currentEv/revenueTTM'],
++  revenuePerShare: ['revenuePerShareTTM', 'revenuePerShareAnnual'],
++  ebitdaPerShare: ['ebitdPerShareTTM', 'ebitdPerShareAnnual'],
++  eps: ['epsTTM', 'epsInclExtraItemsTTM', 'epsBasicExclExtraItemsTTM', 'epsAnnual'],
++  enterpriseValue: ['enterpriseValue'],
++  grossMargin: ['grossMarginTTM', 'grossMarginAnnual'],
++  operatingMargin: ['operatingMarginTTM', 'operatingMarginAnnual'],
++  netMargin: ['netProfitMarginTTM', 'netProfitMarginAnnual'],
++  roe: ['roeTTM', 'roeRfy'],
++  revenueGrowth: ['revenueGrowthTTMYoy', 'revenueGrowthQuarterlyYoy'],
++  dividendYield: ['dividendYieldIndicatedAnnual', 'currentDividendYieldTTM'],
++} as const;
++
++export interface MetricTile {
++  label: string;
++  value: string;
++  hint: string;
++}
++
++export interface FinancialGroups {
++  valuation: MetricTile[];
++  profitability: MetricTile[];
++  absolute: MetricTile[];
++}
++
++/**
++ * Beträge in Mio. USD: Finnhub liefert shareOutstanding in Mio. Stück und *PerShare-Werte in USD.
++ * Umsatz, EBITDA und Nettogewinn werden daraus hochgerechnet und als "berechnet" markiert.
++ */
++export function buildFinancials(metric: Metrics, profile: Pick<CompanyProfile, 'shareOutstanding'>): FinancialGroups {
++  const shares = typeof profile.shareOutstanding === 'number' && profile.shareOutstanding > 0 ? profile.shareOutstanding : null;
++  const total = (perShare: number | null) => (perShare !== null && shares !== null ? perShare * shares : null);
++  const k = METRIC_KEYS;
++
++  const revenue = total(pick(metric, [...k.revenuePerShare]));
++  const ebitda = total(pick(metric, [...k.ebitdaPerShare]));
++  const eps = pick(metric, [...k.eps]);
++  const netIncome = total(eps);
++  const ev = pick(metric, [...k.enterpriseValue]);
++
++  const evEbitdaReported = pick(metric, [...k.evEbitda]);
++  const evRevenueReported = pick(metric, [...k.evRevenue]);
++  const evEbitda = evEbitdaReported ?? (ev !== null && ebitda !== null && ebitda > 0 ? ev / ebitda : null);
++  const evRevenue = evRevenueReported ?? (ev !== null && revenue !== null && revenue > 0 ? ev / revenue : null);
++
++  return {
++    valuation: [
++      { label: 'KGV (P/E)', value: formatMultiple(pick(metric, [...k.pe])), hint: 'Kurs / Gewinn je Aktie' },
++      { label: 'KUV (P/S)', value: formatMultiple(pick(metric, [...k.ps])), hint: 'Börsenwert / Umsatz' },
++      { label: 'KBV (P/B)', value: formatMultiple(pick(metric, [...k.pb])), hint: 'Kurs / Buchwert je Aktie' },
++      { label: 'EV / EBITDA', value: formatMultiple(evEbitda), hint: evEbitdaReported === null ? 'berechnet' : 'Unternehmenswert / EBITDA' },
++      { label: 'EV / Umsatz', value: formatMultiple(evRevenue), hint: evRevenueReported === null ? 'berechnet' : 'Unternehmenswert / Umsatz' },
++    ],
++    profitability: [
++      { label: 'EBITDA-Marge', value: formatPercent(ebitda !== null && revenue !== null && revenue > 0 ? (ebitda / revenue) * 100 : null), hint: 'berechnet' },
++      { label: 'Bruttomarge', value: formatPercent(pick(metric, [...k.grossMargin])), hint: 'TTM' },
++      { label: 'Operative Marge', value: formatPercent(pick(metric, [...k.operatingMargin])), hint: 'TTM' },
++      { label: 'Nettomarge', value: formatPercent(pick(metric, [...k.netMargin])), hint: 'TTM' },
++      { label: 'Eigenkapitalrendite', value: formatPercent(pick(metric, [...k.roe])), hint: 'ROE, TTM' },
++    ],
++    absolute: [
++      { label: 'Umsatz', value: formatUsdMillions(revenue), hint: 'TTM, berechnet' },
++      { label: 'EBITDA', value: formatUsdMillions(ebitda), hint: 'TTM, berechnet' },
++      { label: 'Nettogewinn', value: formatUsdMillions(netIncome), hint: 'TTM, berechnet' },
++      { label: 'Gewinn je Aktie', value: eps === null ? '–' : `${formatNumber(eps)} USD`, hint: 'EPS, TTM' },
++      { label: 'Umsatzwachstum', value: formatPercent(pick(metric, [...k.revenueGrowth])), hint: 'ggü. Vorjahr' },
++      { label: 'Dividendenrendite', value: formatPercent(pick(metric, [...k.dividendYield])), hint: 'p.a.' },
++    ],
++  };
++}
++
++export const PEER_COLUMNS: { label: string; keys: readonly string[]; format: (v: number | null) => string }[] = [
++  { label: 'KGV', keys: METRIC_KEYS.pe, format: formatMultiple },
++  { label: 'KUV', keys: METRIC_KEYS.ps, format: formatMultiple },
++  { label: 'KBV', keys: METRIC_KEYS.pb, format: formatMultiple },
++  { label: 'Bruttomarge', keys: METRIC_KEYS.grossMargin, format: formatPercent },
++  { label: 'Nettomarge', keys: METRIC_KEYS.netMargin, format: formatPercent },
++  { label: 'Wachstum', keys: METRIC_KEYS.revenueGrowth, format: formatPercent },
++];
++
++export const RATING_SEGMENTS = [
++  { key: 'strongBuy', label: 'Stark kaufen' },
++  { key: 'buy', label: 'Kaufen' },
++  { key: 'hold', label: 'Halten' },
++  { key: 'sell', label: 'Verkaufen' },
++  { key: 'strongSell', label: 'Stark verkaufen' },
++] as const;
++
++export function summarizeRecommendation(rec: Recommendation): { total: number; bullishPercent: number } | null {
++  const total = RATING_SEGMENTS.reduce((sum, s) => sum + (rec[s.key] || 0), 0);
++  if (total === 0) return null;
++  return { total, bullishPercent: Math.round((((rec.strongBuy || 0) + (rec.buy || 0)) / total) * 100) };
++}
++
++export function daysUntil(target: Date, today = new Date()): number {
++  const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
++  const end = new Date(target.getFullYear(), target.getMonth(), target.getDate());
++  return Math.round((end.getTime() - start.getTime()) / 86_400_000);
++}
++
++export function relativeDayLabel(days: number): string {
++  if (days === 0) return 'heute';
++  if (days === 1) return 'morgen';
++  return `in ${days} Tagen`;
++}
++
++export const EARNINGS_HOUR_LABELS: Record<string, string> = {
++  bmo: 'vor Börsenstart',
++  amc: 'nach Börsenschluss',
++  dmh: 'während des Handels',
++};
++
++export function safeUrl(url: string | undefined | null): string | null {
++  if (!url) return null;
++  try {
++    const u = new URL(url);
++    return u.protocol === 'https:' || u.protocol === 'http:' ? u.href : null;
++  } catch {
++    return null;
++  }
++}
+diff --git a/src/lib/stocks/finnhub.ts b/src/lib/stocks/finnhub.ts
+new file mode 100644
+index 0000000..e1d1e70
+--- /dev/null
++++ b/src/lib/stocks/finnhub.ts
+@@ -0,0 +1,193 @@
++/**
++ * Finnhub-Client für die Aktienansicht. Läuft im Browser: jeder Nutzer verwendet
++ * seinen eigenen kostenlosen Key (localStorage), es gibt keinen Server-Key.
++ * Limit (429) und ungültiger Key (401) werden an die Oberfläche gemeldet.
++ */
++
++import type {
++  Candles, CompanyProfile, EarningsEvent, Executive, Metrics, NewsItem, Quote,
++  Recommendation, SymbolSearchResult,
++} from './types';
++
++const BASE = 'https://finnhub.io/api/v1';
++const TIMEOUT_MS = 10_000;
++
++export class FinnhubError extends Error {
++  constructor(public status: number, path: string) {
++    super(`Finnhub ${path}: HTTP ${status}`);
++  }
++}
++
++let apiKey = '';
++
++export function setActiveApiKey(key: string): void {
++  apiKey = key;
++}
++
++/* ---------- Key-Probleme an die Oberfläche melden (für useSyncExternalStore) ---------- */
++
++export type KeyProblem = 'limit' | 'invalid';
++
++/** `id` steigt bei jedem neuen Problem, damit ein geschlossener Hinweis beim nächsten Mal wieder erscheint. */
++export interface KeyProblemState {
++  problem: KeyProblem | null;
++  id: number;
++}
++
++let problemState: KeyProblemState = { problem: null, id: 0 };
++const problemListeners = new Set<() => void>();
++
++function setKeyProblem(problem: KeyProblem | null): void {
++  if (problem === problemState.problem) return;
++  problemState = { problem, id: problem ? problemState.id + 1 : problemState.id };
++  problemListeners.forEach((l) => l());
++}
++
++export function clearKeyProblem(): void {
++  setKeyProblem(null);
++}
++
++export function getKeyProblemState(): KeyProblemState {
++  return problemState;
++}
++
++export function subscribeKeyProblem(listener: () => void): () => void {
++  problemListeners.add(listener);
++  return () => {
++    problemListeners.delete(listener);
++  };
++}
++
++/* ---------- Anfragen ---------- */
++
++async function finnhubGet<T>(path: string, params: Record<string, string | number> = {}): Promise<T> {
++  const query = new URLSearchParams({ ...Object.fromEntries(Object.entries(params).map(([k, v]) => [k, String(v)])), token: apiKey });
++  const res = await fetch(`${BASE}${path}?${query}`, { signal: AbortSignal.timeout(TIMEOUT_MS) });
++
++  if (res.status === 429) {
++    setKeyProblem('limit');
++    throw new FinnhubError(res.status, path);
++  }
++  if (res.status === 401) {
++    setKeyProblem('invalid');
++    throw new FinnhubError(res.status, path);
++  }
++  // 403 heißt bei Finnhub meist "nur im bezahlten Plan" und ist kein Key-Problem.
++  if (!res.ok) throw new FinnhubError(res.status, path);
++
++  clearKeyProblem();
++  return res.json() as Promise<T>;
++}
++
++export type KeyCheckResult = 'ok' | 'invalid' | 'limit' | 'unreachable';
++
++/** Prüft einen neuen Key, ohne die Hinweisleiste auszulösen. */
++export async function checkApiKey(key: string): Promise<KeyCheckResult> {
++  try {
++    const res = await fetch(`${BASE}/quote?${new URLSearchParams({ symbol: 'AAPL', token: key })}`, {
++      signal: AbortSignal.timeout(TIMEOUT_MS),
++    });
++    if (res.status === 401 || res.status === 403) return 'invalid';
++    if (res.status === 429) return 'limit';
++    if (!res.ok) return 'unreachable';
++    const data = (await res.json()) as Partial<Quote>;
++    return typeof data.c === 'number' ? 'ok' : 'invalid';
++  } catch {
++    return 'unreachable';
++  }
++}
++
++/* ---------- Datum-Helfer (lokale Zeit, nicht UTC) ---------- */
++
++export function isoDate(date: Date): string {
++  const m = String(date.getMonth() + 1).padStart(2, '0');
++  const d = String(date.getDate()).padStart(2, '0');
++  return `${date.getFullYear()}-${m}-${d}`;
++}
++
++export function parseIsoDate(value: string): Date {
++  const [y, m, d] = value.split('-').map(Number);
++  return new Date(y, m - 1, d);
++}
++
++function daysFromNow(days: number): Date {
++  const d = new Date();
++  d.setDate(d.getDate() + days);
++  return d;
++}
++
++/* ---------- Endpunkte ---------- */
++
++export function fetchQuote(symbol: string): Promise<Quote> {
++  return finnhubGet<Quote>('/quote', { symbol });
++}
++
++export async function searchSymbols(query: string): Promise<SymbolSearchResult[]> {
++  const data = await finnhubGet<{ result?: SymbolSearchResult[] }>('/search', { q: query });
++  return (data.result ?? []).slice(0, 15);
++}
++
++export async function fetchProfile(symbol: string): Promise<CompanyProfile> {
++  const data = await finnhubGet<CompanyProfile>('/stock/profile2', { symbol });
++  if (!data?.name) throw new Error('Kein Profil verfügbar');
++  return data;
++}
++
++export async function fetchExecutives(symbol: string): Promise<Executive[]> {
++  const data = await finnhubGet<{ executive?: Executive[] }>('/stock/executive', { symbol });
++  if (!data?.executive?.length) throw new Error('Keine Management-Daten');
++  return data.executive.slice(0, 6);
++}
++
++export async function fetchCandles(symbol: string): Promise<Candles> {
++  const to = Math.floor(Date.now() / 1000);
++  const from = to - 365 * 24 * 60 * 60;
++  const data = await finnhubGet<Candles>('/stock/candle', { symbol, resolution: 'W', from, to });
++  if (data?.s !== 'ok' || !Array.isArray(data.c) || data.c.length < 2) {
++    throw new Error('Keine historischen Kurse');
++  }
++  return data;
++}
++
++export async function fetchMetrics(symbol: string): Promise<Metrics> {
++  const data = await finnhubGet<{ metric?: Metrics }>('/stock/metric', { symbol, metric: 'all' });
++  if (!data?.metric || Object.keys(data.metric).length === 0) throw new Error('Keine Kennzahlen');
++  return data.metric;
++}
++
++export async function fetchCompanyNews(symbol: string): Promise<NewsItem[]> {
++  const items = await finnhubGet<NewsItem[]>('/company-news', {
++    symbol,
++    from: isoDate(daysFromNow(-14)),
++    to: isoDate(new Date()),
++  });
++  if (!Array.isArray(items)) throw new Error('Keine News');
++  return [...items].sort((a, b) => b.datetime - a.datetime).slice(0, 6);
++}
++
++export async function fetchRecommendation(symbol: string): Promise<Recommendation> {
++  const data = await finnhubGet<Recommendation[]>('/stock/recommendation', { symbol });
++  if (!Array.isArray(data) || data.length === 0) throw new Error('Keine Analystendaten');
++  return [...data].sort((a, b) => String(b.period).localeCompare(String(a.period)))[0];
++}
++
++/** Liefert das Symbol selbst plus bis zu 4 Konkurrenten. */
++export async function fetchPeers(symbol: string): Promise<string[]> {
++  const peers = await finnhubGet<string[]>('/stock/peers', { symbol });
++  if (!Array.isArray(peers)) throw new Error('Keine Peers');
++  return [symbol, ...peers.filter((p) => p !== symbol).slice(0, 4)];
++}
++
++export const EARNINGS_WINDOW_DAYS = 120;
++
++export async function fetchNextEarnings(symbol: string): Promise<EarningsEvent | null> {
++  const data = await finnhubGet<{ earningsCalendar?: EarningsEvent[] }>('/calendar/earnings', {
++    symbol,
++    from: isoDate(new Date()),
++    to: isoDate(daysFromNow(EARNINGS_WINDOW_DAYS)),
++  });
++  const upcoming = (data?.earningsCalendar ?? [])
++    .filter((e) => e.symbol === symbol && e.date)
++    .sort((a, b) => a.date.localeCompare(b.date));
++  return upcoming[0] ?? null;
++}
+diff --git a/src/lib/stocks/storage.ts b/src/lib/stocks/storage.ts
+new file mode 100644
+index 0000000..f2a8216
+--- /dev/null
++++ b/src/lib/stocks/storage.ts
+@@ -0,0 +1,41 @@
++// Browser-Speicher für die Aktienansicht. Fehlt localStorage (privater Modus o. ä.),
++// gelten Key und Watchlist nur für die aktuelle Sitzung.
++
++const KEY_STORAGE = 'parity_finnhub_api_key';
++const WATCHLIST_STORAGE = 'parity_watchlist';
++
++export const DEFAULT_WATCHLIST = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'SAP'];
++
++export function loadApiKey(): string {
++  try {
++    return localStorage.getItem(KEY_STORAGE) ?? '';
++  } catch {
++    return '';
++  }
++}
++
++export function saveApiKey(key: string): void {
++  try {
++    localStorage.setItem(KEY_STORAGE, key);
++  } catch {
++    /* nur für diese Sitzung */
++  }
++}
++
++export function loadWatchlist(): string[] {
++  try {
++    const parsed: unknown = JSON.parse(localStorage.getItem(WATCHLIST_STORAGE) ?? 'null');
++    if (Array.isArray(parsed) && parsed.every((s) => typeof s === 'string')) return parsed;
++  } catch {
++    /* Standardliste */
++  }
++  return [...DEFAULT_WATCHLIST];
++}
++
++export function saveWatchlist(symbols: string[]): void {
++  try {
++    localStorage.setItem(WATCHLIST_STORAGE, JSON.stringify(symbols));
++  } catch {
++    /* nur für diese Sitzung */
++  }
++}
+diff --git a/src/lib/stocks/types.ts b/src/lib/stocks/types.ts
+new file mode 100644
+index 0000000..790aebc
+--- /dev/null
++++ b/src/lib/stocks/types.ts
+@@ -0,0 +1,70 @@
++// Antwortformate der Finnhub-Endpunkte, soweit die Aktienansicht sie nutzt.
++
++export interface Quote {
++  c: number; // aktueller Kurs
++  d: number | null; // Veränderung absolut
++  dp: number | null; // Veränderung in %
++  h: number;
++  l: number;
++  o: number;
++  pc: number; // Vortagesschluss
++}
++
++export interface SymbolSearchResult {
++  symbol: string;
++  description: string;
++  type?: string;
++}
++
++export interface CompanyProfile {
++  name: string;
++  ticker?: string;
++  exchange?: string;
++  finnhubIndustry?: string;
++  country?: string;
++  currency?: string;
++  ipo?: string;
++  logo?: string;
++  weburl?: string;
++  marketCapitalization?: number; // Mio.
++  shareOutstanding?: number; // Mio. Stück
++}
++
++export interface Executive {
++  name: string;
++  title?: string;
++}
++
++export interface Candles {
++  c: number[];
++  t: number[]; // Unix-Sekunden
++  s: string;
++}
++
++export type Metrics = Record<string, number | string | null | undefined>;
++
++export interface NewsItem {
++  id?: number;
++  datetime: number;
++  headline: string;
++  source: string;
++  url: string;
++}
++
++export interface Recommendation {
++  period: string;
++  strongBuy: number;
++  buy: number;
++  hold: number;
++  sell: number;
++  strongSell: number;
++}
++
++export interface EarningsEvent {
++  symbol: string;
++  date: string; // YYYY-MM-DD
++  hour?: string; // bmo | amc | dmh
++  quarter?: number;
++  year?: number;
++  epsEstimate?: number | null;
++}

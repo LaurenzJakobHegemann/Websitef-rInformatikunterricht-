@@ -55,6 +55,8 @@ css/style.css    Styling (Terminal-Look)
 js/api.js        Finnhub-Anbindung, erkennt Limit und ungültigen Key
 js/app.js        Logik: Key-Einrichtung, Aktien-Suche, Watchlist, Firmenprofil, Chart
 js/insights.js   News, Analysten, Peer-Vergleich, Quartalszahlen-Kalender
+terminal-integration/  Dieselben Funktionen als Seite /aktien für das Parity Terminal (Next.js),
+                       im Parity-Design – siehe terminal-integration/ANLEITUNG.md
 ```
 
 ## Hinweis zur API
