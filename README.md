@@ -17,6 +17,9 @@ Aktien-Watchlist mit aktuellen Tageskursen.
 - Vergleich mit bis zu 4 Konkurrenten (KGV, KUV, KBV, Margen, Wachstum)
 - Aktuelle Nachrichten der letzten 14 Tage zur Firma
 - Kalender mit den nächsten Quartalszahlen-Terminen der Watchlist-Aktien
+- Strategie-Labor (`labor.html`): Handelsregeln (SMA-Kreuzung, Momentum, RSI) an simulierten Kursen testen,
+  mit Gebühren, Kennzahlen und einem Härtetest über 400 zufällige Märkte. Funktioniert ohne API-Key.
+  Tests des Rechenkerns: `node --test js/labor-engine.test.js`
 - Kein Server nötig – reine HTML/CSS/JS-Seite
 
 ## Setup

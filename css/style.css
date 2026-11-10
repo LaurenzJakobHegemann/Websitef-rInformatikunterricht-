@@ -787,3 +787,14 @@ button.secondary {
   margin-top: 4px;
   font-size: 0.82rem;
 }
+
+.lab-link {
+  color: var(--accent);
+  text-decoration: none;
+  margin-left: auto;
+  margin-right: 20px;
+}
+
+.lab-link:hover {
+  text-decoration: underline;
+}

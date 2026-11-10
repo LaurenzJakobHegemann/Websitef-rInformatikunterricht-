@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Strategie-Labor · Parity Terminal</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/labor.css">
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="brand">PARITY <span>TERMINAL</span> <span class="lab-tag">/ STRATEGIE-LABOR</span></div>
+    <a class="lab-back" href="index.html">← Watchlist</a>
+  </header>
+
+  <main class="lab">
+    <section class="lab-intro">
+      <h1>Schlägt deine Strategie den Markt?</h1>
+      <p>
+        Hier testest du eine Handelsregel zuerst an einem simulierten Kursverlauf und danach an
+        Hunderten weiteren. Ein einzelner Chart kann Glück sein. Viele Läufe zeigen, was die Regel wirklich taugt.
+        Alles rechnet in deinem Browser, ohne API-Key.
+      </p>
+    </section>
+
+    <section class="lab-controls" aria-label="Einstellungen">
+      <label>Strategie
+        <select id="strategy">
+          <option value="sma">Gleitende Durchschnitte (SMA-Kreuzung)</option>
+          <option value="momentum">Momentum</option>
+          <option value="rsi">RSI (günstig kaufen, teuer verkaufen)</option>
+          <option value="hold">Kaufen und Halten</option>
+        </select>
+      </label>
+      <label id="p1Wrap"><span id="p1Label"></span> <output id="p1Out"></output>
+        <input type="range" id="p1"></label>
+      <label id="p2Wrap"><span id="p2Label"></span> <output id="p2Out"></output>
+        <input type="range" id="p2"></label>
+      <label>Erwartete Rendite pro Jahr <output id="muOut"></output>
+        <input type="range" id="mu" min="-5" max="15" step="0.5" value="7"></label>
+      <label>Schwankung (Volatilität) <output id="sigmaOut"></output>
+        <input type="range" id="sigma" min="5" max="60" step="1" value="20"></label>
+      <label>Zeitraum <output id="yearsOut"></output>
+        <input type="range" id="years" min="2" max="30" step="1" value="10"></label>
+      <label>Gebühr pro Kauf/Verkauf <output id="feeOut"></output>
+        <input type="range" id="fee" min="0" max="100" step="5" value="10"></label>
+      <div class="lab-buttons">
+        <button id="newMarket">Neuer Markt</button>
+        <span class="lab-seed">Markt Nr. <strong id="seedOut"></strong></span>
+      </div>
+    </section>
+
+    <p class="lab-rule" id="ruleText"></p>
+
+    <section class="lab-tiles" id="tiles" aria-live="polite"></section>
+
+    <section class="lab-panel">
+      <h2>Kurs und Handelssignale <span class="lab-legend" id="priceLegend"></span></h2>
+      <canvas id="priceChart" class="lab-canvas tall"></canvas>
+    </section>
+
+    <section class="lab-panel">
+      <h2>Depotwert
+        <span class="lab-legend"><i style="background:var(--accent)"></i>Strategie <i style="background:var(--blue)"></i>Kaufen und Halten</span>
+      </h2>
+      <canvas id="equityChart" class="lab-canvas"></canvas>
+    </section>
+
+    <section class="lab-mc">
+      <h2>Der Härtetest: <span id="mcRuns"></span> zufällige Märkte</h2>
+      <p class="lab-verdict" id="verdict"></p>
+      <div class="lab-grid">
+        <div class="lab-panel">
+          <h3>Mögliche Depotverläufe der Strategie
+            <span class="lab-legend"><i style="background:var(--accent)"></i>Median <i class="band"></i>50 % und 90 % aller Läufe</span></h3>
+          <canvas id="fanChart" class="lab-canvas"></canvas>
+        </div>
+        <div class="lab-panel">
+          <h3>Gesamtrendite am Ende
+            <span class="lab-legend"><i style="background:var(--accent)"></i>Strategie <i style="background:var(--blue)"></i>Kaufen und Halten</span></h3>
+          <canvas id="histChart" class="lab-canvas"></canvas>
+        </div>
+      </div>
+      <div class="lab-tiles" id="mcTiles"></div>
+    </section>
+
+    <p class="setup-note">
+      Die Kurse sind simuliert (Zufallsprozess mit Auf- und Abschwungphasen) und keine echten Börsendaten.
+      Das Labor dient zum Lernen und ist keine Anlageberatung.
+    </p>
+  </main>
+
+  <script src="js/labor-engine.js"></script>
+  <script src="js/labor.js"></script>
+</body>
+</html>
