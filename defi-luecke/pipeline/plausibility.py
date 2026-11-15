@@ -37,8 +37,9 @@ def check_population(
         )
     deviation = (census_sum - official) / official * 100
     passed = abs(deviation) <= max_deviation_pct
+    ref = f" ({reference})" if reference else ""
     msg = (
-        f"Zensus-Summe {census_sum} vs. amtlich {official}{' (' + reference + ')' if reference else ''}: "
+        f"Zensus-Summe {census_sum} vs. amtlich {official}{ref}: "
         f"Abweichung {deviation:+.2f} % (Schwelle ±{max_deviation_pct} %)"
     )
     return CheckResult(

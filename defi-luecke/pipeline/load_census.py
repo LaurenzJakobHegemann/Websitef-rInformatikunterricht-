@@ -16,7 +16,6 @@ from pathlib import Path
 from typing import Any
 
 import geopandas as gpd
-import numpy as np
 import pandas as pd
 
 from pipeline.config import RAW_DIR, Params, RegionConfig
@@ -69,7 +68,8 @@ def check_columns(columns: list[str], candidates: list[str]) -> str:
     missing = [c for c in (ID_COL, X_COL, Y_COL) if c not in columns]
     if missing:
         raise CensusError(
-            f"Spalten fehlen in der Zensus-CSV: {', '.join(missing)}; vorhanden: {', '.join(columns)}"
+            f"Spalten fehlen in der Zensus-CSV: {', '.join(missing)}; "
+            f"vorhanden: {', '.join(columns)}"
         )
     return detect_population_column(columns, candidates)
 

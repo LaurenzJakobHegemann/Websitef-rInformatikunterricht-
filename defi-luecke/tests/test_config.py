@@ -13,8 +13,8 @@ def test_load_real_region():
     region = load_region("bernkastel-wittlich")
     assert region.name == "Landkreis Bernkastel-Wittlich"
     assert region.district_key == "07231"
-    assert region.district_key_verified is False
-    assert region.official_population is None
+    assert region.district_key_verified is True
+    assert region.official_population == 112751
 
 
 def test_load_real_params():

@@ -6,7 +6,6 @@ import pytest
 from pipeline.cli import main
 
 STEP_MILESTONES = {
-    "fetch": "M1",
     "coverage": "M2",
     "optimize": "M3",
     "validate": "M5",
@@ -29,9 +28,27 @@ def test_stub_step_fails_with_german_message(step, milestone, capsys):
     assert f"Schritt '{step}' ist noch nicht implementiert (Meilenstein {milestone})" in err
 
 
-def test_run_stops_at_first_stub(capsys):
+def test_run_stops_at_first_failing_step(monkeypatch, capsys):
+    from pipeline import cli
+
+    def fake_run_step(step, region_cfg, params):
+        raise cli.StepNotImplementedError(step, "M1")
+
+    monkeypatch.setattr(cli, "run_step", fake_run_step)
     assert main(["run", "--region", "bernkastel-wittlich"]) != 0
     assert "Schritt 'fetch' ist noch nicht implementiert" in capsys.readouterr().err
+
+
+def test_fetch_osm_unavailable_exits_4(monkeypatch, capsys):
+    from pipeline import cli
+    from pipeline.fetch_osm import OsmUnavailableError
+
+    def fake_run_step(step, region_cfg, params):
+        raise OsmUnavailableError("Manueller Schritt: ...")
+
+    monkeypatch.setattr(cli, "run_step", fake_run_step)
+    assert main(["fetch", "--region", "bernkastel-wittlich"]) == 4
+    assert "Manueller Schritt" in capsys.readouterr().err
 
 
 def test_unknown_region_nonzero(capsys):
