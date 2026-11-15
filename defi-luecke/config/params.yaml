@@ -1,0 +1,60 @@
+# Model parameters. Values marked "placeholder" are defaults from SPEC v0.1;
+# the team fixes the final values based on the literature (SPEC section 13).
+
+crs:
+  compute: "EPSG:3035"   # ETRS89-LAEA, native CRS of the census grid
+  web: "EPSG:4326"       # WGS84 for the web app
+
+osm:
+  overpass_url: "https://overpass-api.de/api/interpreter"
+  query_buffer_m: 2000   # bounding box buffer around the region
+  timeout_s: 180
+  aed_tags_to_keep:
+    - access
+    - opening_hours
+    - indoor
+    - "defibrillator:location"
+    - level
+    - operator
+    - check_date
+    - "survey:date"
+    - description
+
+coverage:
+  detour_factor: 1.3                 # placeholder
+  radii_m: [100, 200, 300, 500]      # placeholder
+  walking_speed_m_per_s: 1.4         # placeholder, only for the time-to-radius helper
+  scenarios:
+    - all
+    - night_strict
+    - night_optimistic
+  excluded_access_values: [private, "no"]
+
+optimize:
+  k_max_district: 20
+  k_max_municipality: 3
+  candidate_variants: [A, B]
+  # Variant B: publicly accessible places from OSM (key -> list of values).
+  candidate_osm_tags:
+    amenity:
+      - townhall
+      - fire_station
+      - community_centre
+      - bank
+      - pharmacy
+      - place_of_worship
+      - school
+    leisure:
+      - sports_hall
+    shop:
+      - supermarket
+    highway:
+      - bus_stop
+
+validation:
+  match_tolerance_m: 50
+  confidence_level: 0.95
+
+plausibility:
+  max_population_deviation_pct: 3.0  # placeholder ("wenige Prozent")
+  duplicate_distance_m: 5            # placeholder ("wenige Meter")

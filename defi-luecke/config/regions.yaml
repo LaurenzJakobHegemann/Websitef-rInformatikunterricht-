@@ -1,0 +1,23 @@
+# Pilot regions. Keys are used as --region on the command line.
+regions:
+  bernkastel-wittlich:
+    name: "Landkreis Bernkastel-Wittlich"
+    state: "Rheinland-Pfalz"
+    # Kreisschlüssel (AGS, 5 digits). Expected value, NOT yet verified against
+    # the VG250 boundary dataset. The pipeline must check it in M1.
+    district_key: "07231"
+    district_key_verified: false
+    # Official population for the plausibility check (section 10).
+    # Left empty on purpose: the value must be taken from an official source
+    # (e.g. VG250 attribute or Statistisches Landesamt), not guessed.
+    official_population: null
+    official_population_source: null
+
+  # Pilot region B: to be decided by the team (SPEC section 13).
+  region-b:
+    name: null
+    state: null
+    district_key: null
+    district_key_verified: false
+    official_population: null
+    official_population_source: null
