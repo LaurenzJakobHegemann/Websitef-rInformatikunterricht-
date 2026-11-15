@@ -6,7 +6,13 @@ crs:
   web: "EPSG:4326"       # WGS84 for the web app
 
 osm:
-  overpass_url: "https://overpass-api.de/api/interpreter"
+  # Tried in this order. All serve the same Overpass API on OSM data.
+  overpass_urls:
+    - "https://overpass-api.de/api/interpreter"
+    - "https://overpass.private.coffee/api/interpreter"
+    - "https://overpass.kumi.systems/api/interpreter"
+  # Fixed snapshot for all analyses (YYYY-MM-DD). Empty = newest snapshot in data/raw.
+  snapshot_date: null
   query_buffer_m: 2000   # bounding box buffer around the region
   timeout_s: 180
   aed_tags_to_keep:
@@ -19,6 +25,19 @@ osm:
     - check_date
     - "survey:date"
     - description
+
+census:
+  zip_url: "https://www.destatis.de/static/DE/zensus/gitterdaten/Zensus2022_Bevoelkerungszahl.zip"
+  csv_name: "Zensus2022_Bevoelkerungszahl_100m-Gitter.csv"
+  # Value column: documented name first, actual header of the CSV second (see docs/schnittstellen.md)
+  population_columns: ["Bevoelkerungszahl", "Einwohner"]
+  attribution: "© Statistische Ämter des Bundes und der Länder, 2024, dl-de/by-2-0"
+
+boundaries:
+  zip_url: "https://daten.gdz.bkg.bund.de/produkte/vg/vg250-ew_ebenen_1231/aktuell/vg250-ew_12-31.utm32s.gpkg.ebenen.zip"
+  gpkg_member: "vg250-ew_ebenen_1231/DE_VG250.gpkg"
+  land_gf_value: 4   # vg250.pdf, section 3.2.3
+  attribution: "© BKG (2026) dl-de/by-2-0"
 
 coverage:
   detour_factor: 1.3                 # placeholder

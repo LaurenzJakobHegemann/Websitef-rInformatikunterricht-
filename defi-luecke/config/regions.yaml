@@ -3,15 +3,15 @@ regions:
   bernkastel-wittlich:
     name: "Landkreis Bernkastel-Wittlich"
     state: "Rheinland-Pfalz"
-    # Kreisschlüssel (AGS, 5 digits). Expected value, NOT yet verified against
-    # the VG250 boundary dataset. The pipeline must check it in M1.
+    # Kreisschlüssel (AGS). Verified 2026-11-15 in VG250-EW (Stand 31.12.2025):
+    # AGS 07231 = "Bernkastel-Wittlich", BEZ "Landkreis". The pipeline re-checks it.
     district_key: "07231"
-    district_key_verified: false
-    # Official population for the plausibility check (section 10).
-    # Left empty on purpose: the value must be taken from an official source
-    # (e.g. VG250 attribute or Statistisches Landesamt), not guessed.
-    official_population: null
-    official_population_source: null
+    district_key_verified: true
+    # Official population for the plausibility check (SPEC section 10).
+    # Read at runtime from the EWZ attribute of VG250-EW; the value here is the
+    # documented reference and is compared against it.
+    official_population: 112751
+    official_population_source: "BKG VG250-EW, Attribut EWZ (Destatis, Stand 31.12.2025)"
 
   # Pilot region B: to be decided by the team (SPEC section 13).
   region-b:
