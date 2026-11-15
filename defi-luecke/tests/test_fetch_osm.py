@@ -1,5 +1,6 @@
 """Tests for OSM parsing and snapshot handling. SYNTHETIC data, no network."""
 
+import dataclasses
 import json
 
 import pytest
@@ -7,7 +8,9 @@ import pytest
 from pipeline import fetch_osm
 from pipeline.config import load_params
 
-PARAMS = load_params()
+# Snapshot tests must not depend on the pinned date in config/params.yaml.
+_real = load_params()
+PARAMS = dataclasses.replace(_real, osm={**_real.osm, "snapshot_date": None})
 KEEP = PARAMS.osm["aed_tags_to_keep"]
 EXCL = PARAMS.coverage["excluded_access_values"]
 
