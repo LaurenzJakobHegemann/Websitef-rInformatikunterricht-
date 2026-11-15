@@ -522,7 +522,6 @@ function setupSearch(): void {
   const list = $('search-results');
   const close = () => {
     list.hidden = true;
-    input.setAttribute('aria-expanded', 'false');
   };
   const choose = (ags: string) => {
     const name = state.data?.metrics.levels.municipality[ags]?.name ?? '';
@@ -541,17 +540,16 @@ function setupSearch(): void {
       .sort((a, b) => Number(norm(b.name).startsWith(q)) - Number(norm(a.name).startsWith(q)) || a.name.localeCompare(b.name, 'de'))
       .slice(0, 8);
     if (!hits.length) {
-      list.append(h('li', { class: 'none', role: 'option', 'aria-disabled': 'true' }, 'Keine Gemeinde gefunden'));
+      list.append(h('li', { class: 'none' }, 'Keine Gemeinde gefunden'));
     }
     for (const p of hits) {
-      const li = h('li', { role: 'option', 'aria-selected': 'false' });
+      const li = h('li');
       const b = h('button', { type: 'button' }, p.name);
       b.addEventListener('click', () => choose(p.ags));
       li.append(b);
       list.append(li);
     }
     list.hidden = false;
-    input.setAttribute('aria-expanded', 'true');
   };
   input.addEventListener('input', update);
   input.addEventListener('keydown', (e) => {
