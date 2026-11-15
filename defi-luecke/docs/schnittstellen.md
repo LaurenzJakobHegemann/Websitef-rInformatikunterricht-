@@ -31,8 +31,8 @@ Verbindlicher Datenvertrag zwischen den Modulen. Feldnamen sind englisch, damit 
 
 | Datei | Erzeugt von | Inhalt |
 |---|---|---|
-| `data/raw/osm_aed_<region>_<YYYY-MM-DD>.json` | fetch_osm | unveränderte Overpass-Antwort (AEDs) |
-| `data/raw/osm_candidates_<region>_<YYYY-MM-DD>.json` | fetch_osm | unveränderte Overpass-Antwort (Kandidatenorte Variante B) |
+| `data/raw/osm_aed_<region>_<YYYY-MM-DD>.json` oder `.geojson` | fetch_osm | unveränderte Overpass-Antwort (AEDs); `.geojson` = Export aus overpass-turbo |
+| `data/raw/osm_candidates_<region>_<YYYY-MM-DD>.json` oder `.geojson` | fetch_osm | unveränderte Overpass-Antwort (Kandidatenorte Variante B) |
 | `data/raw/zensus2022/…` | load_census | ZIP und Datensatzbeschreibung |
 | `data/raw/vg250/…` | fetch_boundaries | ZIP, entpackt |
 | `data/interim/<region>.gpkg` | fetch (M1) | Ebenen siehe unten, alle in EPSG:3035 |

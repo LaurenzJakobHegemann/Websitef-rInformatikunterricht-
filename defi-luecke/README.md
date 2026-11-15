@@ -6,7 +6,14 @@ Defi-Lücke zeigt, wie gut die Bevölkerung einer Region mit öffentlich zugäng
 
 Zielgruppe: Gemeinden, Vereine, Sponsoren, Rettungsdienste.
 
-## Installation
+## Projektstand
+
+Pilotregion A (Landkreis Bernkastel-Wittlich): **M0 bis M5 umgesetzt, M6 offen.** Pilotregion B ist noch nicht festgelegt.
+
+- M0 Setup, M1 Daten, M2 Abdeckung, M3 Optimierer, M4 Web-App, M5 Validierung und Grafiken: umgesetzt
+- M6 Ausbau (Fußweg im Wegenetz, exaktes Optimierungsverfahren, Pilotregion B, ganz Rheinland-Pfalz): offen, einzeln freizugeben
+
+## Schnellstart
 
 Voraussetzung: Python 3.11 oder neuer (getestet mit Python 3.13).
 
@@ -14,27 +21,22 @@ Voraussetzung: Python 3.11 oder neuer (getestet mit Python 3.13).
 cd defi-luecke
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
-```
-
-Eine Installation mit `pip install -e .` ist nicht nötig.
-
-## Nutzung
-
-Konfiguration prüfen:
-
-```bash
-python -m pipeline.cli check-config --region bernkastel-wittlich
-```
-
-Gesamtlauf:
-
-```bash
+source .venv/bin/activate
 python -m pipeline.cli run --region bernkastel-wittlich
 ```
+
+**Hinweis zu OSM-Daten:** Die Overpass API war aus der Cloud-Umgebung nicht erreichbar. Bricht `fetch` mit Exit-Code 4 ab, gehen Sie so vor:
+
+1. Die Abfrage aus `data/raw/overpass_query_aed_bernkastel-wittlich.overpassql` in [overpass-turbo](https://overpass-turbo.eu) ausführen und als GeoJSON exportieren.
+2. Die Datei unverändert als `data/raw/osm_aed_<region>_<YYYY-MM-DD>.geojson` speichern (Datum = Abruftag).
+3. `python -m pipeline.cli fetch --region bernkastel-wittlich` erneut starten.
+
+Die ausführliche Anleitung steht in `data/raw/SOURCES.md`. Zensus und VG250 lädt die Pipeline selbst herunter.
 
 Einzelschritte:
 
 ```bash
+python -m pipeline.cli check-config --region bernkastel-wittlich
 python -m pipeline.cli fetch --region bernkastel-wittlich
 python -m pipeline.cli coverage --region bernkastel-wittlich
 python -m pipeline.cli optimize --region bernkastel-wittlich
@@ -43,7 +45,35 @@ python -m pipeline.cli figures --region bernkastel-wittlich
 python -m pipeline.cli export-web --region bernkastel-wittlich
 ```
 
-Die Rohdaten liegen nicht im Repository. Welche Quellen wie beschafft werden, steht in `data/raw/SOURCES.md`.
+## Web-App
+
+Die Web-App ist eine statische Seite (Vite, TypeScript, Leaflet) ohne Backend. Sie lädt nur vorberechnete Dateien.
+
+```bash
+# Zuerst die Daten aus der Pipeline exportieren (im Ordner defi-luecke/)
+python -m pipeline.cli export-web --region bernkastel-wittlich
+
+cd web
+npm ci
+npm run dev       # Entwicklungsserver
+npm run build     # Typprüfung und statischer Build nach web/dist/
+```
+
+Die einzige externe Anfrage sind die Kartenkacheln von `tile.openstreetmap.org`. Es gibt keine Cookies, Tracker oder externen Schriftarten.
+
+## Ergebnisse
+
+| Pfad | Inhalt |
+|---|---|
+| `data/interim/<region>.gpkg` | Ebenen AEDs, Zellen, Gemeinden, VG, Kreis, Kandidaten (EPSG:3035) |
+| `data/interim/<region>_fetch_report.json` | Snapshot-Dateien, Datenstände, Plausibilitätsprüfungen |
+| `data/processed/<region>/metrics_<level>.csv` | Kennzahlen je Gemeinde, Verbandsgemeinde und Kreis |
+| `data/processed/<region>/optimize_<variant>_<scope>.csv` | Optimierer-Ranglisten für Variante A und B |
+| `data/processed/<region>/validation_<area>.json` | Validierung: Recall, Precision, Intervalle |
+| `data/processed/<region>/figures/` | Auswertungsgrafiken (PNG und SVG) |
+| `web/public/data/<region>/` | Daten für die Web-App |
+
+Die Methodik und die Grenzen stehen in `docs/methodik.md`. Die Datenverträge zwischen den Modulen beschreibt `docs/schnittstellen.md`.
 
 ## Tests und Linting
 
@@ -52,39 +82,11 @@ Die Rohdaten liegen nicht im Repository. Welche Quellen wie beschafft werden, st
 .venv/bin/ruff check .
 ```
 
-## Projektstand
-
-Aktuell: **M0 Setup** (Repo-Gerüst, Konfiguration, CLI-Grundgerüst, Tests).
-
-Meilensteine (SPEC Abschnitt 11):
-
-- **M0 Setup:** Repo-Gerüst, Konfiguration, CLI-Grundgerüst, Tests laufen.
-- **M1 Daten:** AEDs, Gitter und Grenzen für Pilotregion A abrufen und aufbereiten.
-- **M2 Abdeckung:** Kennzahlen für alle Radien und Szenarien.
-- **M3 Optimierer:** Greedy-Verfahren für Kandidatenvarianten A und B.
-- **M4 Web-App:** Karte, Steckbriefe, Empfehlungen; lokal und als statischer Build.
-- **M5 Validierung und Grafiken:** Erhebungsvergleich und Auswertungsgrafiken.
-- **M6 Ausbau (optional):** Fußweg im Wegenetz, exaktes Optimierungsverfahren, Pilotregion B, ganz Rheinland-Pfalz.
-
-## Projektstruktur
-
-```
-defi-luecke/
-  README.md          diese Datei
-  SPEC.md            Projekt-Spezifikation (Arbeitsauftrag)
-  config/            Regionen (regions.yaml) und Parameter (params.yaml)
-  pipeline/          Python-Pipeline und CLI (pipeline/cli.py)
-  data/              raw (nicht im Repo), interim, processed
-  validation/        Vorlage für die Erhebung vor Ort
-  web/               statische Web-App
-  tests/             pytest-Tests
-  docs/              Methodik, Entscheidungen, KI-Protokoll
-```
-
 ## Dokumentation
 
 - [SPEC.md](SPEC.md): Ziel, Forschungsfragen, Datenquellen, Meilensteine
-- [docs/methodik.md](docs/methodik.md): Methodik und Grenzen
-- [docs/entscheidungen.md](docs/entscheidungen.md): Entscheidungen mit Begründung
+- [docs/methodik.md](docs/methodik.md): Methodik, Ergebnisse und Grenzen
+- [docs/schnittstellen.md](docs/schnittstellen.md): Datenverträge zwischen den Pipeline-Schritten
+- [docs/entscheidungen.md](docs/entscheidungen.md): Entscheidungen mit Begründung und Status
 - [docs/ki-protokoll.md](docs/ki-protokoll.md): KI-Unterstützung im Projekt
 - [data/raw/SOURCES.md](data/raw/SOURCES.md): Datenquellen und Quellenvermerke

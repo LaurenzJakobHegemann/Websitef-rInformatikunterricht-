@@ -2,7 +2,7 @@
 
 Dieses Dokument beschreibt alle Rohdaten, die die Pipeline für die Pilotregion verwendet. Die Angaben sind am 15.11.2026 gegen die tatsächlichen Dateien geprüft (siehe auch `docs/schnittstellen.md`).
 
-**Hinweis:** Der Ordner `data/raw/` liegt nicht im Repository. Die Inhalte werden per `.gitignore` ausgeschlossen; versioniert ist nur diese Datei. Der Befehl `python -m pipeline.cli fetch --region bernkastel-wittlich` lädt ZIP-Dateien selbst herunter, wenn sie fehlen (vorhandene werden nicht erneut geladen). Scheitert ein Download, bricht die Pipeline mit einer Anleitung ab (SPEC, Abschnitt 0); der manuelle Schritt steht jeweils unten.
+**Hinweis:** Zensus- und VG250-Dateien liegen nicht im Repository (per `.gitignore` ausgeschlossen, groß und jederzeit neu ladbar). Versioniert sind diese Datei, die OSM-Snapshots (`osm_*.json`, `osm_*.geojson`) und die Overpass-Abfragen (`overpass_query_*.overpassql`), weil ein OSM-Stand nicht identisch neu abrufbar ist (siehe `docs/entscheidungen.md`). Der Befehl `python -m pipeline.cli fetch --region bernkastel-wittlich` lädt ZIP-Dateien selbst herunter, wenn sie fehlen (vorhandene werden nicht erneut geladen). Scheitert ein Download, bricht die Pipeline mit einer Anleitung ab (SPEC, Abschnitt 0); der manuelle Schritt steht jeweils unten.
 
 ---
 
