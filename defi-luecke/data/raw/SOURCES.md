@@ -1,134 +1,108 @@
 # Datenquellen (Rohdaten)
 
-Dieses Dokument beschreibt alle Rohdaten, die die Pipeline für die Pilotregion verwendet. Quelle der Angaben ist `SPEC.md`, Abschnitt 3. Alles, was dort nicht steht, ist als **TODO (M1)** markiert und wird im Meilenstein M1 (Daten) ergänzt.
+Dieses Dokument beschreibt alle Rohdaten, die die Pipeline für die Pilotregion verwendet. Die Angaben sind am 15.11.2026 gegen die tatsächlichen Dateien geprüft (siehe auch `docs/schnittstellen.md`).
 
-**Hinweis:** Der Ordner `data/raw/` liegt nicht im Repository. Die Inhalte werden per `.gitignore` ausgeschlossen; versioniert ist nur diese Datei (`data/raw/SOURCES.md`). Die Rohdaten müssen daher bei jeder neuen Einrichtung neu abgerufen bzw. manuell abgelegt werden.
-
-Falls ein automatischer Download scheitert, wird er nicht umgangen. Stattdessen wird der manuelle Schritt unten beschrieben, und die Pipeline bricht mit einer verständlichen Fehlermeldung ab (SPEC, Abschnitt 0).
+**Hinweis:** Der Ordner `data/raw/` liegt nicht im Repository. Die Inhalte werden per `.gitignore` ausgeschlossen; versioniert ist nur diese Datei. Der Befehl `python -m pipeline.cli fetch --region bernkastel-wittlich` lädt ZIP-Dateien selbst herunter, wenn sie fehlen (vorhandene werden nicht erneut geladen). Scheitert ein Download, bricht die Pipeline mit einer Anleitung ab (SPEC, Abschnitt 0); der manuelle Schritt steht jeweils unten.
 
 ---
 
 ## 1. AED-Standorte: OpenStreetMap (Overpass API)
 
-**Was:** Öffentlich erfasste Defibrillatoren aus OpenStreetMap. Grundlage für alle Abdeckungsberechnungen (F1) und für die Validierung der Datenvollständigkeit (F2).
+**Was:** Öffentlich erfasste Defibrillatoren aus OpenStreetMap (Grundlage für F1 und F2).
 
-**Woher:** Overpass API, `https://overpass-api.de/api/interpreter`
+**Woher:** Overpass API. Endpunkte in `config/params.yaml` (`osm.overpass_urls`), jeder wird einmal in dieser Reihenfolge versucht (Verbindungs-Timeout 8 s, Antwort-Timeout `timeout_s` + 30 s).
 
-**Abfrage (SPEC 3.1):**
+**Abfragegebiet:** Kreisfläche (VG250, GF = 4) in EPSG:3035 um `query_buffer_m` = 2000 m gepuffert, nach WGS84 umgerechnet, Bounding Box auf 4 Nachkommastellen. Für Bernkastel-Wittlich (Süd, West, Nord, Ost): `49.6550, 6.6534, 50.1495, 7.2916`.
 
-- Tag `emergency=defibrillator`
-- Elementtypen Knoten, Wege und Relationen (`nwr`), Ausgabe `out center tags`
-- Abfragegebiet: Bounding Box der Region plus 2 km Puffer (`query_buffer_m: 2000` in `config/params.yaml`)
-- Zu speichernde Tags, soweit vorhanden: `access`, `opening_hours`, `indoor`, `defibrillator:location`, `level`, `operator`, `check_date`, `survey:date`, `description`
+**AED-Abfrage:**
 
-**Lizenz:** ODbL
+```
+[out:json][timeout:180];
+nwr["emergency"="defibrillator"](49.6550,6.6534,50.1495,7.2916);
+out center tags;
+```
 
-**Quellenvermerk:** „© OpenStreetMap-Mitwirkende"
+**Kandidaten-Abfrage (Variante B)**, Tags aus `optimize.candidate_osm_tags`:
 
-**Erwarteter Dateiname (Snapshot):**
+```
+[out:json][timeout:180];
+(
+  nwr["amenity"~"^(townhall|fire_station|community_centre|bank|pharmacy|place_of_worship|school)$"](49.6550,6.6534,50.1495,7.2916);
+  nwr["leisure"="sports_hall"](49.6550,6.6534,50.1495,7.2916);
+  nwr["shop"="supermarket"](49.6550,6.6534,50.1495,7.2916);
+  node["highway"="bus_stop"](49.6550,6.6534,50.1495,7.2916);
+);
+out center tags;
+```
+
+Die Pipeline schreibt beide Abfragen bei jedem Lauf nach `data/raw/overpass_query_aed_<region>.overpassql` und `data/raw/overpass_query_candidates_<region>.overpassql`.
+
+**Gespeicherte Tags (AEDs):** `access`, `opening_hours`, `indoor`, `defibrillator:location`, `level`, `operator`, `check_date`, `survey:date`, `description`. Wege und Relationen werden über `center` zum Punkt.
+
+**Lizenz:** ODbL. **Quellenvermerk:** „© OpenStreetMap-Mitwirkende".
+
+**Snapshot-Dateien:**
 
 ```
 data/raw/osm_aed_<region>_<YYYY-MM-DD>.json
+data/raw/osm_candidates_<region>_<YYYY-MM-DD>.json
 ```
 
-Beispiel: `data/raw/osm_aed_bernkastel-wittlich_<YYYY-MM-DD>.json`, wobei das Datum der Abruftag ist.
+Datum = Abruftag. Die Datei ist die unveränderte Overpass-Antwort. Auswahl: `osm.snapshot_date` (wenn gesetzt, wird genau dieser Snapshot verwendet und nichts geladen), sonst existiert für heute ein Snapshot (kein Download), sonst wird ein Abruf versucht und bei Misserfolg der neueste vorhandene Snapshot verwendet. Das verwendete Datum steht im Fetch-Report.
 
-Der Rohabruf wird unverändert mit Zeitstempel als Snapshot abgelegt. Alle Auswertungen laufen gegen einen festgelegten Snapshot, nicht gegen Live-Daten (SPEC 3.1).
+**Manueller Download (wenn kein Overpass-Server erreichbar ist, Exit-Code 4):**
 
-**Manueller Download:**
+1. Abfrage ausführen, entweder per Direktlink (Muster `https://overpass-api.de/api/interpreter?data=<URL-kodierte Abfrage>`; die Pipeline gibt den fertigen Link in der Fehlermeldung aus) oder: Inhalt der `.overpassql`-Datei auf https://overpass-turbo.eu einfügen, ausführen, Export > Rohdaten (JSON) speichern.
+2. Antwort **unverändert** als `data/raw/osm_aed_<region>_<heutiges Datum>.json` bzw. `data/raw/osm_candidates_<region>_<heutiges Datum>.json` speichern.
+3. `python -m pipeline.cli fetch --region <region>` erneut ausführen. Grenzen und Zensus sind dann bereits verarbeitet, die ZIP-Dateien werden nicht erneut geladen.
 
-- TODO (M1): Schritte für den manuellen Abruf über die Overpass API festlegen (Abfragetext mit Bounding Box, Ausgabeformat, Speicherort und Umbenennung nach Snapshot-Konvention).
-- TODO (M1): Verhalten bei Zeitüberschreitung (Konfigurationswert `timeout_s: 180`) und bei Ablehnung durch den Server dokumentieren.
+Bei Zeitüberschreitung oder Ablehnung (z. B. HTTP 429) probiert die Pipeline den nächsten Server; sind alle erfolglos, gilt der manuelle Schritt.
 
 ---
 
 ## 2. Bevölkerung: Zensus 2022, 100-m-Gitter
 
-**Was:** Datensatz „Bevölkerungszahlen in Gitterzellen" des Zensus 2022. Grundlage für die Nachfragepunkte (Mittelpunkte der bewohnten 100-m-Zellen, gewichtet mit der Einwohnerzahl).
+**Was:** Datensatz „Bevölkerungszahl" in 100-m-Gitterzellen. Grundlage für die Nachfragepunkte.
 
-**Woher:** zensus2022.de, Bereich Ergebnisse, Gitterdaten.
+**Woher:** `https://www.destatis.de/static/DE/zensus/gitterdaten/Zensus2022_Bevoelkerungszahl.zip` (zensus2022.de leitet auf destatis.de um). Ablage: `data/raw/zensus2022/Zensus2022_Bevoelkerungszahl.zip`.
 
-- TODO (M1): Direkte URL der Download-Seite bzw. der ZIP-Datei eintragen. SPEC nennt nur den Bereich, nicht die Adresse.
+**ZIP-Inhalt:** `Zensus2022_Bevoelkerungszahl_100m-Gitter.csv` (verwendet), `…_1km-Gitter.csv`, `…_10km-Gitter.csv`, `Datensatzbeschreibung_Bevoelkerungszahl_Gitterzellen.xlsx`.
 
-**Inhalt des ZIP (SPEC 3.2):**
+**Spalten der 100-m-CSV (Trennzeichen `;`):** `GITTER_ID_100m`, `x_mp_100m`, `y_mp_100m`, Wertespalte. Die Datensatzbeschreibung nennt die Wertespalte `Bevoelkerungszahl`, die tatsächliche Kopfzeile lautet aber `Einwohner`. Der Code akzeptiert beide (`census.population_columns`) und schreibt den gefundenen Namen in den Fetch-Report. Fehlt beides, bricht er mit einer Fehlermeldung ab.
 
-- CSV-Dateien für das 10-km-, 1-km- und 100-m-Gitter
-- eine Datensatzbeschreibung als Excel-Datei
+**Koordinaten:** `x_mp_100m`/`y_mp_100m` sind Zellmittelpunkte in EPSG:3035. Das Zeichen `–` in der Wertespalte heißt „genau null oder auf null geändert" und wird als 0 gelesen. Zellen ohne Einwohner fehlen in der Datei. Die Pipeline behält nur Zellen mit Einwohnern > 0, deren Mittelpunkt im Kreis liegt.
 
-Verwendet wird ausschließlich die **100-m-Datei**. Spaltennamen und deren Bedeutung werden aus der Datensatzbeschreibung übernommen und nicht geraten. Die Pipeline prüft im Code, ob die erwarteten Spalten vorhanden sind (SPEC 0).
+**Stichtag:** 15.05.2022. Geheimhaltung per Cell-Key-Methode (stochastische Überlagerung), Summen können abweichen.
 
-- TODO (M1): Spaltennamen aus der Datensatzbeschreibung in dieses Dokument übernehmen (nicht vorher festlegen).
+**Lizenz:** Datenlizenz Deutschland – Namensnennung – Version 2.0 (dl-de/by-2-0). **Quellenvermerk:** „© Statistische Ämter des Bundes und der Länder, 2024".
 
-**Koordinatensystem:** ETRS89-LAEA (EPSG:3035)
-
-**Stichtag:** 15.05.2022. Kleine Zellwerte sind durch ein Geheimhaltungsverfahren verändert. Beides wird in `docs/methodik.md` als Einschränkung festgehalten.
-
-**Lizenz:** TODO (M1): Lizenz von der Downloadseite übernehmen.
-
-**Quellenvermerk:** TODO (M1): exakten Quellenvermerk von der Downloadseite übernehmen.
-
-**Erwarteter Dateiname:**
-
-- TODO (M1): Dateiname der 100-m-CSV aus dem ZIP übernehmen und die Ablagekonvention in `data/raw/` festlegen. SPEC legt für diese Quelle keine Snapshot-Benennung fest.
-
-**Manueller Download:**
-
-- TODO (M1): Schritte für den manuellen Download des ZIP festlegen (Seite, Auswahl des Datensatzes, Entpacken nach `data/raw/`).
+**Manueller Download:** ZIP von der obigen URL im Browser laden und unter `data/raw/zensus2022/` ablegen (nicht entpacken, die Pipeline liest die CSV direkt aus dem ZIP).
 
 ---
 
-## 3. Verwaltungsgrenzen: BKG VG250
+## 3. Verwaltungsgrenzen: BKG VG250-EW
 
-**Was:** Open-Data-Produkt „Verwaltungsgebiete 1:250 000" des Bundesamts für Kartographie und Geodäsie (BKG). Grundlage für die Zuordnung der Zellen und AEDs zu Gemeinden, Verbandsgemeinden und Kreisen.
+**Was:** „Verwaltungsgebiete 1:250 000 mit Einwohnerzahlen" (Stand 31.12.2025) des BKG.
 
-**Woher:**
+**Woher:** `https://daten.gdz.bkg.bund.de/produkte/vg/vg250-ew_ebenen_1231/aktuell/vg250-ew_12-31.utm32s.gpkg.ebenen.zip`. Ablage: ZIP und entpackt in `data/raw/vg250/`; GeoPackage `data/raw/vg250/vg250-ew_ebenen_1231/DE_VG250.gpkg` (EPSG:25832).
 
-- Download über `gdz.bkg.bund.de`
-- oder per WFS: `https://sgx.geodatenzentrum.de/wfs_vg250`
+**Ebenen:** `vg250_krs`, `vg250_vwg` (Verbandsgemeinden), `vg250_gem`. Attribute in Großbuchstaben: `AGS`, `ARS`, `GEN`, `BEZ`, `GF`, `EWZ`, `KFL`, …
 
-**Benötigte Ebenen (SPEC 3.3):**
+**Landflächen:** Filter `GF = 4` (`vg250.pdf`, Abschnitt 3.2.3; Konfiguration `boundaries.land_gf_value`).
 
-- Gemeinden
-- Verwaltungsgemeinschaften (in Rheinland-Pfalz die Verbandsgemeinden)
-- Kreise
+**Kreisschlüssel:** `07231` = „Bernkastel-Wittlich", Landkreis, EWZ 112751; die Pipeline prüft ihn bei jedem Lauf. Zuordnung Gemeinde → Verbandsgemeinde: die ersten 9 Stellen des Gemeinde-`ARS` entsprechen dem `ARS` der Verwaltungsgemeinschaft.
 
-**Nur Landflächen verwenden.** Das dafür zuständige Attribut wird der Produktdokumentation entnommen.
+**Lizenz:** dl-de/by-2-0. **Quellenvermerk:** „© BKG (2026) dl-de/by-2-0", Links https://www.bkg.bund.de und https://www.govdata.de/dl-de/by-2-0 (`dokumentation/nutzungsbedingungen_vg250.pdf`).
 
-- TODO (M1): Name des Attributs für Landflächen aus der Produktdokumentation eintragen.
-
-**Kreisschlüssel:** Der Kreisschlüssel des Landkreises Bernkastel-Wittlich (erwartet `07231`) ist in `config/regions.yaml` noch nicht verifiziert (`district_key_verified: false`). Die Pipeline muss ihn in M1 gegen diesen Datensatz prüfen.
-
-**Lizenz:** Datenlizenz Deutschland – Namensnennung – Version 2.0
-
-**Quellenvermerk:** „© BKG (Jahr) dl-de/by-2-0"
-
-- TODO (M1): Platzhalter „(Jahr)" mit dem Jahr aus der Produktdokumentation ersetzen.
-
-**Erwarteter Dateiname:**
-
-- TODO (M1): Dateiname bzw. Ebenennamen des Downloads und die Ablagekonvention in `data/raw/` festlegen.
-
-**Manueller Download:**
-
-- TODO (M1): Schritte für den manuellen Download über gdz.bkg.bund.de festlegen (Produkt, Format, Auswahl der Ebenen).
-- TODO (M1): Schritte für den WFS-Abruf festlegen, falls der automatische Abruf scheitert.
+**Manueller Download:** ZIP von der obigen URL laden, nach `data/raw/vg250/` legen und dort entpacken. Alternativ WFS `https://sgx.geodatenzentrum.de/wfs_vg250` (von der Pipeline nicht automatisch genutzt).
 
 ---
 
 ## 4. Kandidatenstandorte für neue AEDs
 
-Für die Kandidatenstandorte wird **keine eigene Datenquelle** heruntergeladen. Sie werden aus den bereits genannten Quellen abgeleitet (SPEC 3.4).
+Keine eigene Datenquelle.
 
-**Variante A (theoretisch):** Mittelpunkte aller bewohnten Gitterzellen aus Abschnitt 2 (Zensus 2022).
+- **Variante A:** Mittelpunkte der bewohnten Zellen (Ebene `cells` der Interim-Datei).
+- **Variante B:** OSM-Orte aus der Kandidaten-Abfrage (Abschnitt 1), Ebene `candidates` mit `category` (z. B. `amenity=pharmacy`).
 
-**Variante B (praxisnah):** öffentlich zugängliche Orte aus OpenStreetMap, z. B. Rathaus, Feuerwehr, Gemeindehaus, Bank, Apotheke, Kirche, Schule, Sporthalle, Supermarkt, Bushaltestelle. Die genaue Tag-Liste wird in `config/params.yaml` (Abschnitt `optimize.candidate_osm_tags`) gepflegt.
-
-**Lizenz:** ODbL (wie Abschnitt 1, weil aus OpenStreetMap abgeleitet)
-
-**Quellenvermerk:** „© OpenStreetMap-Mitwirkende"
-
-**Erwarteter Dateiname:** Keine eigene Datei im Rohdatenordner. Die Ableitung aus dem OSM-Snapshot und dem Zensus-Gitter erfolgt in der Pipeline.
-
-- TODO (M1): Ablage der abgeleiteten Kandidatenliste (z. B. in `data/interim/`) festlegen.
-
-**Manueller Download:** nicht nötig, da keine eigene Quelle. Die Kandidaten hängen vom OSM-Snapshot (Abschnitt 1) ab.
+Ablage der Ergebnisse: `data/interim/<region>.gpkg` (Ebenen `aeds`, `cells`, `municipalities`, `vg`, `district`, `candidates`, alle EPSG:3035) und `data/interim/<region>_fetch_report.json` (Snapshot-Dateien, Datenstände, Quellenvermerke, Plausibilitätsergebnisse, verwendete Bevölkerungsspalte).

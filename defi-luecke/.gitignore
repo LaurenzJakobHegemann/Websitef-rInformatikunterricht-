@@ -5,6 +5,10 @@ __pycache__/
 .ruff_cache/
 data/raw/*
 !data/raw/SOURCES.md
+# OSM snapshots are frozen inputs and cannot be re-downloaded identically (docs/entscheidungen.md)
+!data/raw/osm_*.json
+!data/raw/osm_*.geojson
+!data/raw/overpass_query_*.overpassql
 data/interim/*
 !data/interim/.gitkeep
 data/processed/*

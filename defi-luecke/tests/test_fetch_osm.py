@@ -140,3 +140,40 @@ def test_get_snapshot_falls_back_to_older(tmp_path):
     (tmp_path / "osm_aed_x_2026-01-01.json").write_text(json.dumps({"elements": []}))
     snap = fetch_osm.get_snapshot("aed", "Q", "x", PARAMS, tmp_path, post=_failing_post)
     assert snap.date == "2026-01-01"
+
+
+def test_geojson_to_elements_overpass_turbo_export():
+    """SYNTHETIC overpass-turbo GeoJSON export (node point and way polygon)."""
+    from pipeline.fetch_osm import geojson_to_elements
+
+    fc = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "id": "node/1",
+                "properties": {"@id": "node/1", "emergency": "defibrillator", "access": "yes"},
+                "geometry": {"type": "Point", "coordinates": [7.0, 50.0]},
+            },
+            {
+                "type": "Feature",
+                "id": "way/2",
+                "properties": {"@id": "way/2", "emergency": "defibrillator"},
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [
+                        [[7.0, 50.0], [7.1, 50.0], [7.1, 50.1], [7.0, 50.1], [7.0, 50.0]]
+                    ],
+                },
+            },
+        ],
+    }
+    els = geojson_to_elements(fc)
+    assert els[0] == {
+        "type": "node",
+        "id": 1,
+        "tags": {"emergency": "defibrillator", "access": "yes"},
+        "lat": 50.0,
+        "lon": 7.0,
+    }
+    assert els[1]["type"] == "way" and "center" in els[1] and "@id" not in els[1]["tags"]

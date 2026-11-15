@@ -97,7 +97,8 @@ def _scenario_label(s: str) -> str:
 def _pct_axis(ax, axis: str = "y") -> None:
     from matplotlib.ticker import PercentFormatter
 
-    getattr(ax, f"{axis}axis").set_major_formatter(PercentFormatter(1.0, decimals=0))
+    # decimals=None lets matplotlib pick enough decimals so tick labels stay distinct.
+    getattr(ax, f"{axis}axis").set_major_formatter(PercentFormatter(1.0, decimals=None))
 
 
 # ------------------------------------------------------------------ figures
@@ -317,7 +318,7 @@ def fig_optimizer(processed: Path, fig_dir: Path) -> list[Path]:
     nrows = -(-len(radii) // ncols)
     fig, axes = plt.subplots(nrows, ncols, figsize=(6 * ncols, 3.8 * nrows), squeeze=False)
     style = {
-        "A": (OI["blue"], "o", "Variante A (Gemeindezentren)"),
+        "A": (OI["blue"], "o", "Variante A (Mittelpunkte bewohnter Zellen)"),
         "B": (OI["orange"], "s", "Variante B (OSM-Orte)"),
     }
     for ax, r in zip(axes.flat, radii, strict=False):
@@ -331,6 +332,9 @@ def fig_optimizer(processed: Path, fig_dir: Path) -> list[Path]:
             )
         ax.set_title(f"Radius {int(r)} m")
         ax.set_xlabel("Anzahl zusätzlicher AEDs (k)")
+        from matplotlib.ticker import MaxNLocator
+
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
         ax.set_ylabel("Abdeckungsquote")
         _pct_axis(ax)
         ax.grid(alpha=0.3)

@@ -22,7 +22,7 @@ from typing import Any
 
 import geopandas as gpd
 import requests
-from shapely.geometry import Point
+from shapely.geometry import Point, shape
 
 from pipeline.config import RAW_DIR, Params, RegionConfig
 
@@ -32,7 +32,7 @@ OSM_ATTRIBUTION = "© OpenStreetMap-Mitwirkende (ODbL)"
 KINDS = ("aed", "candidates")
 OVERPASS_GET_PREFIX = "https://overpass-api.de/api/interpreter?data="
 CONNECT_TIMEOUT_S = 8
-_DATE_RE = re.compile(r"_(\d{4}-\d{2}-\d{2})\.json$")
+_DATE_RE = re.compile(r"_(\d{4}-\d{2}-\d{2})\.(?:geo)?json$")
 
 
 class OsmUnavailableError(Exception):
@@ -189,9 +189,12 @@ def query_path(raw_dir: Path, kind: str, region: str) -> Path:
 def list_snapshots(raw_dir: Path, kind: str, region: str) -> list[tuple[str, Path]]:
     """All snapshots as (date, path), oldest first."""
     found = []
-    for path in raw_dir.glob(f"osm_{kind}_{region}_*.json"):
+    for path in raw_dir.glob(f"osm_{kind}_{region}_*"):
         m = _DATE_RE.search(path.name)
-        if m and path.name == f"osm_{kind}_{region}_{m.group(1)}.json":
+        if m and path.name in (
+            f"osm_{kind}_{region}_{m.group(1)}.json",
+            f"osm_{kind}_{region}_{m.group(1)}.geojson",
+        ):
             found.append((m.group(1), path))
     return sorted(found)
 
@@ -305,9 +308,46 @@ def get_snapshot(
     )
 
 
+def geojson_to_elements(fc: dict[str, Any]) -> list[dict[str, Any]]:
+    """overpass-turbo GeoJSON export -> Overpass-like elements (``type``, ``id``, ``tags``).
+
+    overpass-turbo stores the OSM id as feature id ``node/123`` and adds meta keys starting
+    with ``@``, which are dropped. Non-point geometries (ways/relations exported as shapes)
+    get a ``center`` from the geometry's representative point.
+    """
+    elements = []
+    for feat in fc.get("features", []):
+        props = feat.get("properties") or {}
+        fid = str(feat.get("id") or props.get("@id") or "")
+        if "/" not in fid:
+            log.warning("GeoJSON-Feature ohne OSM-ID übersprungen: %r", fid)
+            continue
+        osm_type, osm_id = fid.split("/", 1)
+        tags = {k: v for k, v in props.items() if not k.startswith("@")}
+        el: dict[str, Any] = {"type": osm_type, "id": int(osm_id), "tags": tags}
+        geom = feat.get("geometry")
+        if geom and geom.get("type") == "Point":
+            lon, lat = geom["coordinates"][:2]
+            if osm_type == "node":
+                el["lat"], el["lon"] = lat, lon
+            else:
+                el["center"] = {"lat": lat, "lon": lon}
+        elif geom:
+            pt = shape(geom).representative_point()
+            el["center"] = {"lat": pt.y, "lon": pt.x}
+        elements.append(el)
+    return elements
+
+
 def _load(kind: str, chosen: tuple[str, Path], source: str, url: str | None = None) -> OsmSnapshot:
     date, path = chosen
     data = json.loads(path.read_text(encoding="utf-8"))
+    if isinstance(data, dict) and data.get("type") == "FeatureCollection":
+        log.info("OSM-Snapshot '%s' liegt als GeoJSON (overpass-turbo) vor.", kind)
+        data = {
+            "elements": geojson_to_elements(data),
+            "osm3s": {"timestamp_osm_base": data.get("timestamp")},
+        }
     _validate_response(data)
     ts = (data.get("osm3s") or {}).get("timestamp_osm_base")
     log.info("OSM-Snapshot '%s': %s (%d Elemente)", kind, path.name, len(data["elements"]))

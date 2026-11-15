@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta
+      name="description"
+      content="Defi-Lücke: Wie gut ist die Bevölkerung mit öffentlich zugänglichen Defibrillatoren (AED) versorgt, und wo bringt ein zusätzliches Gerät am meisten?"
+    />
+    <title>Defi-Lücke – AED-Versorgung auf der Karte</title>
+  </head>
+  <body>
+    <a class="skip" href="#main">Zum Inhalt springen</a>
+    <div class="banner" role="note">
+      <strong>Kein Notfall-Tool – im Notfall 112 anrufen.</strong>
+    </div>
+    <header class="site-header">
+      <h1>Defi-Lücke</h1>
+      <nav aria-label="Hauptnavigation">
+        <a href="#/" data-nav="map">Karte</a>
+        <a href="#/melden" data-nav="melden">Fehlenden Defi melden</a>
+        <a href="#/methodik" data-nav="methodik">Methodik und Grenzen</a>
+      </nav>
+    </header>
+
+    <main id="main" tabindex="-1">
+      <!-- ===================== Karte ===================== -->
+      <section id="view-map" class="view" aria-label="Karte">
+        <div id="data-error" class="notice notice-error" role="alert" hidden></div>
+        <div class="layout">
+          <div class="area-ctl" id="controls">
+            <div class="row" id="region-row" hidden>
+              <label for="sel-region">Region</label>
+              <select id="sel-region"></select>
+            </div>
+            <div class="row two">
+              <div>
+                <label for="sel-radius">Radius</label>
+                <select id="sel-radius"></select>
+              </div>
+              <div>
+                <label for="sel-scenario">Szenario</label>
+                <select id="sel-scenario"></select>
+              </div>
+            </div>
+          </div>
+
+          <div class="area-map">
+            <div
+              id="map"
+              role="region"
+              aria-label="Karte der AED-Versorgung. Mit Pfeiltasten verschieben, mit Plus und Minus zoomen. Alle Zahlen stehen auch in der Gemeindetabelle unter der Karte."
+            ></div>
+          </div>
+
+          <div class="area-side" id="side">
+            <p class="aed-stat" id="aed-stat" aria-live="polite"></p>
+
+            <fieldset class="layers">
+              <legend>Ebenen</legend>
+              <label class="chk"><input type="checkbox" id="chk-aeds" checked />
+                <span class="sym sym-aed" aria-hidden="true"></span> AED-Standorte</label>
+              <label class="chk"><input type="checkbox" id="chk-gaps" />
+                <span class="sym sym-gap" aria-hidden="true"></span> Lücken (bewohnte, nicht abgedeckte Zellen)</label>
+              <label class="chk"><input type="checkbox" id="chk-rec" />
+                <span class="sym sym-rec" aria-hidden="true">1</span> Empfehlungen (neue Standorte)</label>
+              <p class="hint" id="gaps-msg" hidden></p>
+            </fieldset>
+
+            <fieldset class="recbox" id="recbox" hidden>
+              <legend>Empfehlungen</legend>
+              <div class="row">
+                <span class="lbl" id="lbl-variant">Kandidaten</span>
+                <div role="radiogroup" aria-labelledby="lbl-variant" class="seg" id="seg-variant"></div>
+              </div>
+              <div class="row">
+                <label for="rng-k">Anzahl neuer Standorte: <output id="out-k">5</output></label>
+                <input type="range" id="rng-k" min="1" max="20" value="5" />
+              </div>
+              <p class="hint" id="rec-summary" aria-live="polite"></p>
+              <p class="hint" id="rec-msg" hidden></p>
+            </fieldset>
+
+            <div class="search">
+              <label for="inp-search">Gemeinde suchen</label>
+              <input type="search" id="inp-search" autocomplete="off" placeholder="Name der Gemeinde"
+                role="combobox" aria-expanded="false" aria-controls="search-results" aria-autocomplete="list" />
+              <ul id="search-results" role="listbox" aria-label="Suchergebnisse" hidden></ul>
+            </div>
+
+            <section id="profile" class="profile" aria-live="polite" aria-label="Steckbrief"></section>
+
+            <details class="table-wrap">
+              <summary>Alle Gemeinden als Tabelle</summary>
+              <div class="table-scroll">
+                <table id="muni-table">
+                  <caption class="sr-only">Gemeinden nach Abdeckungsquote</caption>
+                  <thead><tr><th scope="col">Rang</th><th scope="col">Gemeinde</th><th scope="col">Quote</th><th scope="col">Einwohner</th></tr></thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== Melden ===================== -->
+      <section id="view-melden" class="view page" hidden>
+        <h2>Fehlenden Defi melden</h2>
+        <p>
+          Die Karte zeigt nur, was in <strong>OpenStreetMap</strong> eingetragen ist. Kennst du einen
+          öffentlich zugänglichen Defibrillator, der fehlt, kannst du ihn selbst eintragen. Dann
+          erscheint er auch in OpenAEDMap und bei der nächsten Auswertung hier.
+          Diese Seite speichert nichts von dir und hat kein Formular.
+        </p>
+        <h3>So geht es</h3>
+        <ol>
+          <li>
+            <strong>Am einfachsten über OpenAEDMap:</strong> Auf
+            <a href="https://openaedmap.org" target="_blank" rel="noopener noreferrer">openaedmap.org</a>
+            die Stelle auf der Karte suchen und über die Schaltfläche zum Hinzufügen eines Defibrillators
+            den Eintrag anlegen. Die Seite führt durch die nötigen Angaben.
+          </li>
+          <li>
+            <strong>Oder direkt in OpenStreetMap:</strong> Auf
+            <a href="https://www.openstreetmap.org" target="_blank" rel="noopener noreferrer">openstreetmap.org</a>
+            ein (kostenloses) Konto anlegen, den Ort suchen, „Bearbeiten“ wählen und einen Punkt mit dem
+            Tag <code>emergency=defibrillator</code> setzen.
+          </li>
+          <li>
+            Wichtige Angaben, damit der Eintrag für die Auswertung nützlich ist:
+            <ul>
+              <li><code>defibrillator:location</code>: wo genau das Gerät hängt (z. B. „im Eingang des Rathauses“)</li>
+              <li><code>opening_hours</code>: <code>24/7</code> oder die genauen Zeiten</li>
+              <li><code>indoor</code>: <code>yes</code> (im Gebäude) oder <code>no</code> (außen)</li>
+              <li><code>access</code>: <code>yes</code> (öffentlich), bei nicht öffentlichen Geräten <code>private</code></li>
+            </ul>
+          </li>
+          <li>Nur Geräte eintragen, die du selbst gesehen hast oder die dir die Betreiber bestätigt haben.</li>
+        </ol>
+        <p class="hint">
+          Neue Einträge erscheinen hier erst, wenn die Daten neu ausgewertet werden (siehe
+          Datenstand auf der Seite „Methodik und Grenzen“).
+        </p>
+        <p><a href="#/" class="btn">Zurück zur Karte</a></p>
+      </section>
+
+      <!-- ===================== Methodik ===================== -->
+      <section id="view-methodik" class="view page" hidden>
+        <h2>Methodik und Grenzen</h2>
+        <p>
+          Defi-Lücke zeigt, welcher Anteil der Einwohner einer Region innerhalb eines festgelegten Radius
+          einen öffentlich zugänglichen Defibrillator (AED) erreicht, und berechnet, an welchen Standorten
+          ein zusätzliches Gerät den größten Zugewinn bringt. Es ist ein Forschungsprojekt
+          (Jugend forscht) und <strong>kein Notfall-Tool</strong>. Im Notfall: <a href="tel:112">112</a>.
+        </p>
+
+        <h3>Datenquellen und Datenstand</h3>
+        <dl id="meth-sources" class="kv"></dl>
+
+        <h3>Modell</h3>
+        <ul>
+          <li>Nachfrage: Mittelpunkt jeder bewohnten 100-m-Gitterzelle, gewichtet mit der Einwohnerzahl.</li>
+          <li>Distanz: Luftlinie mal Umwegfaktor (<span id="meth-detour">1,3</span>).
+              Eine Zelle gilt als abgedeckt, wenn der nächste zulässige AED höchstens so weit entfernt ist wie der gewählte Radius
+              (<span id="meth-radii">100 m bis 500 m</span>; Platzhalterwerte, noch nicht fachlich festgelegt).</li>
+          <li>Szenarien: <em>alle zugänglichen AEDs</em> (alle außer <code>access=private</code> und <code>access=no</code>);
+              <em>nachts, streng</em> (nur <code>opening_hours=24/7</code>, untere Schranke);
+              <em>nachts, optimistisch</em> (zusätzlich AEDs ohne Öffnungszeiten-Angabe, die laut <code>indoor=no</code> außen hängen, obere Schranke).</li>
+          <li>Zugangsklassen je AED: „24/7“, „eingeschränkt“ (andere Öffnungszeiten) und „unbekannt“ (keine Öffnungszeiten eingetragen).
+              Der Anteil „unbekannt“ wird immer mit ausgewiesen.</li>
+          <li>Empfehlungen: Greedy-Verfahren für das Maximal Covering Location Problem. In jedem Schritt wird der Kandidat gewählt,
+              der die meisten noch nicht abgedeckten Einwohner erreicht. Variante A nutzt die Mittelpunkte bewohnter Zellen (theoretisch),
+              Variante B öffentlich zugängliche Orte aus OpenStreetMap (praxisnah).</li>
+          <li>Die Farbskala der Karte reicht von 0&nbsp;% bis zum aufgerundeten Höchstwert der aktuellen Auswahl; die Legende nennt die Klassen.</li>
+        </ul>
+
+        <h3>Grenzen</h3>
+        <ul class="limits">
+          <li>OpenStreetMap ist unvollständig. Die berechnete Abdeckung ist deshalb eher eine <strong>untere Schranke</strong>; wie groß die Lücke in den Daten ist, schätzt ein Abgleich mit einer eigenen Erhebung vor Ort.</li>
+          <li>Die Bevölkerungsdaten stammen vom Zensus-Stichtag 15.05.2022; kleine Zellwerte sind durch ein Geheimhaltungsverfahren verändert.</li>
+          <li>Abgebildet wird nur die Wohnbevölkerung, nicht Arbeitsplätze, Veranstaltungen oder Tourismus.</li>
+          <li>Luftlinie mal Umwegfaktor ist eine Näherung; Steigungen und Barrieren fehlen.</li>
+          <li>Ob ein Gerät funktionsbereit ist, lässt sich aus den Daten nicht ablesen.</li>
+          <li>Das Werkzeug ersetzt keine fachliche Planung durch Rettungsdienst oder Kommune.</li>
+        </ul>
+
+        <h3>Datenschutz</h3>
+        <p>
+          Die Seite setzt keine Cookies, nutzt keine Tracker und keine externen Schriftarten. Die Kartenkacheln
+          lädt dein Browser von <code>tile.openstreetmap.org</code> (dabei wird deine IP-Adresse an die
+          OpenStreetMap Foundation übertragen). Es werden keine Eingaben gespeichert.
+        </p>
+        <p><a href="#/" class="btn">Zurück zur Karte</a></p>
+      </section>
+    </main>
+
+    <footer class="site-footer" id="site-footer">
+      <p>Kartendaten: © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap-Mitwirkende</a> (ODbL)</p>
+      <p id="footer-attrib"></p>
+    </footer>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

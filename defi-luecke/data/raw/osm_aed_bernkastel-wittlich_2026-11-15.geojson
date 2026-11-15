@@ -1,0 +1,3718 @@
+{
+ "type": "FeatureCollection",
+ "generator": "overpass-turbo",
+ "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+ "timestamp": "2026-11-15T08:44:04Z",
+ "features": [
+  {
+   "type": "Feature",
+   "id": "node/658109661",
+   "properties": {
+    "@id": "node/658109661",
+    "access": "yes",
+    "defibrillator:location": "Außen am Gebäude",
+    "emergency": "defibrillator",
+    "opening_hours": "24/7"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.9549665,
+     49.8827081
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/1248221403",
+   "properties": {
+    "@id": "node/1248221403",
+    "access": "yes",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "opening_hours": "24/7",
+    "wheelchair": "limited"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.0627323,
+     49.9162858
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/1580377705",
+   "properties": {
+    "@id": "node/1580377705",
+    "access": "yes",
+    "disused:amenity": "atm",
+    "emergency": "defibrillator",
+    "image": "https://openaedmap.org/api/v1/photos/view/tl2t6THNsWmrApqkiPZr8A.webp",
+    "image:license": "CC0",
+    "indoor": "no",
+    "wheelchair": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.7523336,
+     49.8190526
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/1580769229",
+   "properties": {
+    "@id": "node/1580769229",
+    "emergency": "defibrillator",
+    "indoor": "yes",
+    "opening_hours": "Mo-We 07:30-17:00; Tu 07:30-18:00; Fr 07:30-12:30",
+    "operator": "DRK-Ortsverein Schweich e.V."
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.7522554,
+     49.8195442
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/2147574726",
+   "properties": {
+    "@id": "node/2147574726",
+    "defibrillator:location": "In der Rezeption nach der Tür rechts // In the building, right side",
+    "emergency": "defibrillator",
+    "indoor": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.8914847,
+     49.8033986
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/2912725812",
+   "properties": {
+    "@id": "node/2912725812",
+    "access": "yes",
+    "check_date": "2026-07-27",
+    "defibrillator:location:de": "An der Vorderseite, zur Maximinstraße",
+    "emergency": "defibrillator",
+    "image": "https://openaedmap.org/api/v1/photos/view/i2eZnwtCKz4l3jJZ5OpdAA.webp",
+    "image:license": "CC0",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.7721314,
+     49.8076365
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/3050807236",
+   "properties": {
+    "@id": "node/3050807236",
+    "access": "customers",
+    "defibrillator:location": "Im Vorraum",
+    "defibrillator:location:en": "In the lobby",
+    "emergency": "defibrillator",
+    "indoor": "yes",
+    "level": "0",
+    "opening_hours": "24/7",
+    "phone": "+49 6531 76250"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.074913,
+     49.8915164
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/3406307176",
+   "properties": {
+    "@id": "node/3406307176",
+    "defibrillator:location": "Im Gebäude, Im Spieleparadies, rechts. // In the building, in the indoor playground, right hand side.",
+    "emergency": "defibrillator",
+    "indoor": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.8906336,
+     49.8029896
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/4231617350",
+   "properties": {
+    "@id": "node/4231617350",
+    "access": "yes",
+    "check_date": "2025-04-04",
+    "defibrillator:location": "Links neben dem Tor in einem grünen runden Kasten",
+    "defibrillator:location:de": "AED befindet sich am Feuerwehrhaus links neben dem Tor und der Feuermelder.",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "opening_hours": "24/7",
+    "operator": "Förderverein Freiwillige Feuerwehr Minheim",
+    "wheelchair": "limited"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.9345033,
+     49.865482
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/4351779440",
+   "properties": {
+    "@id": "node/4351779440",
+    "emergency": "defibrillator"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.7439484,
+     49.9386582
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/4738385617",
+   "properties": {
+    "@id": "node/4738385617",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "opening_hours": "24/7"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.911387,
+     49.9572954
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/5387182752",
+   "properties": {
+    "@id": "node/5387182752",
+    "access": "yes",
+    "defibrillator:location": "Hängt rechtsseitig neben dem Feuerwehrhaus",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "opening_hours": "24/7",
+    "wheelchair": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.8448559,
+     49.8762829
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/5693125221",
+   "properties": {
+    "@id": "node/5693125221",
+    "emergency": "defibrillator"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.8739419,
+     50.0281452
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/5777018853",
+   "properties": {
+    "@id": "node/5777018853",
+    "access": "yes",
+    "defibrillator:location": "An der Touristeninformation",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "operator": "VG Bernkastel-Kues",
+    "phone": "+49 6507 2027",
+    "wheelchair": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.9235865,
+     49.880169
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/5952073295",
+   "properties": {
+    "@id": "node/5952073295",
+    "access": "yes",
+    "check_date": "2025-08-15",
+    "defibrillator:location": "neben dem Geldautomat",
+    "emergency": "defibrillator",
+    "indoor": "yes",
+    "level": "0",
+    "opening_hours": "24/7",
+    "operator": "Stadt Cochem",
+    "wheelchair": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.1667545,
+     50.1475812
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/5952306765",
+   "properties": {
+    "@id": "node/5952306765",
+    "emergency": "defibrillator"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.9927791,
+     49.793455
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/6703089208",
+   "properties": {
+    "@id": "node/6703089208",
+    "defibrillator:location": "an der Hauswand des Feuerwehrhauses",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "opening_hours": "24/7",
+    "operator": "Ortsgemeinde Niederscheidweiler",
+    "wheelchair": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.9447898,
+     50.0638631
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/6703157723",
+   "properties": {
+    "@id": "node/6703157723",
+    "access": "yes",
+    "defibrillator:location": "Der Defibrillator ist im Vorraum der Raiffeisenbank angebracht.",
+    "emergency": "defibrillator",
+    "indoor": "yes",
+    "level": "1",
+    "opening_hours": "24/7",
+    "operator": "Raiffeisenbank Moselkrampen e.G.",
+    "wheelchair": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2312319,
+     50.1295094
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/6703169798",
+   "properties": {
+    "@id": "node/6703169798",
+    "defibrillator:location": "Der Defibrillator ist im Vorraum der Raiffeisenbank angebracht.",
+    "emergency": "defibrillator",
+    "indoor": "yes",
+    "operator": "Raiffeisenbank Moselkrampen e.G.",
+    "wheelchair": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2244193,
+     50.1435649
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/6703174427",
+   "properties": {
+    "@id": "node/6703174427",
+    "access": "yes",
+    "check_date": "2025-10-26",
+    "defibrillator:location": "Der Defibrillator ist im Vorraum der Raiffeisenbank angebracht.",
+    "emergency": "defibrillator",
+    "indoor": "yes",
+    "operator": "Raiffeisenbank Moselkrampen e.G.",
+    "wheelchair": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.1550747,
+     50.0957631
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/6938460316",
+   "properties": {
+    "@id": "node/6938460316",
+    "access": "yes",
+    "check_date": "2026-08-27",
+    "defibrillator:location": "Aussenwand links neben Eingangstür",
+    "defibrillator:location:en": "Outer wall to the left of the entrance door",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "opening_hours": "24/7",
+    "operator": "VG Bernkastel-Kues",
+    "phone": "+49 6531 5001931",
+    "wheelchair": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.1163337,
+     49.8909258
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/7964884173",
+   "properties": {
+    "@id": "node/7964884173",
+    "access": "yes",
+    "emergency": "defibrillator",
+    "opening_hours": "24/7",
+    "operator": "Freiwillige Feuerwehr Bremm",
+    "wheelchair": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.1177056,
+     50.0986792
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/8171342953",
+   "properties": {
+    "@id": "node/8171342953",
+    "access": "yes",
+    "defibrillator:location": "Rechts neben der Haustür and der Außenwand",
+    "emergency": "defibrillator",
+    "operator": "privat"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.1476392,
+     50.0982722
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/8391912439",
+   "properties": {
+    "@id": "node/8391912439",
+    "access": "yes",
+    "defibrillator:location": "Im Foyer",
+    "defibrillator:location:en": "In the lobby",
+    "emergency": "defibrillator",
+    "indoor": "yes",
+    "level": "1",
+    "opening_hours": "Tu-Th 16:00-22:30, Fr 16:00-00:30, Sa-Su 13:45-22:30",
+    "phone": "+49 6531 2597",
+    "wheelchair": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.0726864,
+     49.912129
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/8391974869",
+   "properties": {
+    "@id": "node/8391974869",
+    "access": "yes",
+    "emergency": "defibrillator",
+    "note": "position estimated, add: must be Raiffeisenplatz 1",
+    "opening_hours": "24/7",
+    "operator": "Verbandsgemeinde Bernkastel-Kues",
+    "phone": "+49 6533 76440"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.0239282,
+     49.8893948
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/8391996211",
+   "properties": {
+    "@id": "node/8391996211",
+    "access": "yes",
+    "emergency": "defibrillator",
+    "indoor": "yes",
+    "note": "position estimated, add: must be Rathausplatz 7",
+    "opening_hours": "24/7",
+    "operator": "VG Bernkastel-Kues",
+    "phone": "+49 6532 2620"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.0053506,
+     49.9783873
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/8392036166",
+   "properties": {
+    "@id": "node/8392036166",
+    "access": "yes",
+    "emergency": "defibrillator"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.9976889,
+     49.8774166
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/8392039890",
+   "properties": {
+    "@id": "node/8392039890",
+    "access": "yes",
+    "emergency": "defibrillator",
+    "phone": "+49 6761 8330"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.1868094,
+     49.8935411
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/8392125395",
+   "properties": {
+    "@id": "node/8392125395",
+    "access": "yes",
+    "emergency": "defibrillator",
+    "note": "position estimated, addr: must be Hauptstrasse 20",
+    "opening_hours": "24/7"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2178325,
+     49.8747996
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/8392144252",
+   "properties": {
+    "@id": "node/8392144252",
+    "emergency": "defibrillator",
+    "note": "position estimated, addr: must be Hauptstrasse 22"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.1299191,
+     49.8789895
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/8524463727",
+   "properties": {
+    "@id": "node/8524463727",
+    "access": "yes",
+    "check_date": "2026-08-23",
+    "defibrillator:location:de": "neben dem Eingang des Bürgerhauses.",
+    "emergency": "defibrillator",
+    "image": "https://openaedmap.org/api/v1/photos/view/EbrjcSHovIolzlAtc8r_Dg.webp",
+    "image:license": "CC0",
+    "indoor": "no",
+    "opening_hours": "24/7"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.7332844,
+     49.7729356
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/8808916478",
+   "properties": {
+    "@id": "node/8808916478",
+    "access": "yes",
+    "check_date": "2025-08-29",
+    "defibrillator:location": "Links an der Hauswand",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "opening_hours": "24/7"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.0217833,
+     49.9172403
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/9730790169",
+   "properties": {
+    "@id": "node/9730790169",
+    "access": "yes",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "level": "0",
+    "opening_hours": "24/7"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.8663419,
+     50.0656005
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/9788303543",
+   "properties": {
+    "@id": "node/9788303543",
+    "defibrillator:location": "Gymnasium Traben-Trabach - Nähe Lehrerzimmer",
+    "emergency": "defibrillator",
+    "indoor": "yes",
+    "opening_hours": "\"zu den Schulzeiten\"",
+    "operator": "Björn Steiger Stiftung",
+    "operator:wikidata": "Q879521",
+    "operator:wikipedia": "de:Björn Steiger Stiftung",
+    "ref": "2849"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.1071488,
+     49.9419163
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/9807998350",
+   "properties": {
+    "@id": "node/9807998350",
+    "defibrillator:location": "Edeka Convenda, links vom Eingang Marktleiter Büro",
+    "emergency": "defibrillator",
+    "indoor": "yes",
+    "opening_hours": "Mo-Sa 08:00-21:00",
+    "operator": "Björn Steiger Stiftung",
+    "operator:wikidata": "Q879521",
+    "operator:wikipedia": "de:Björn Steiger Stiftung",
+    "ref": "2391"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2805412,
+     49.92776
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/9893654926",
+   "properties": {
+    "@id": "node/9893654926",
+    "access": "yes",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "level": "0",
+    "location": "outdoor",
+    "opening_hours": "24/7",
+    "wheelchair": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.7489458,
+     49.9307807
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/10015685269",
+   "properties": {
+    "@id": "node/10015685269",
+    "access": "yes",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "level": "0",
+    "opening_hours": "24/7",
+    "wheelchair": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.151128,
+     49.8330308
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/10128173756",
+   "properties": {
+    "@id": "node/10128173756",
+    "defibrillator:location": "hinter Notfalltüre",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "operator": "Feuerwehr Hupperath"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.8340817,
+     49.9980109
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/10284525256",
+   "properties": {
+    "@id": "node/10284525256",
+    "access": "yes",
+    "defibrillator:location": "Links neben dem Eingang zur Touristinformation Trittenheim",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "level": "0",
+    "opening_hours": "24/7",
+    "wheelchair": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.8998898,
+     49.8233986
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/10567935734",
+   "properties": {
+    "@id": "node/10567935734",
+    "defibrillator:location": "GLOBUS Markthalle Wittlich, links an der Säule an der Info-Theke",
+    "emergency": "defibrillator",
+    "indoor": "yes",
+    "opening_hours": "Mo-Sa 08:00-20:00; Su, PH off",
+    "operator": "Björn Steiger Stiftung",
+    "operator:wikidata": "Q879521",
+    "operator:wikipedia": "de:Björn Steiger Stiftung",
+    "ref": "3268"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.9086478,
+     49.9813194
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/10615064344",
+   "properties": {
+    "@id": "node/10615064344",
+    "access": "yes",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "level": "0"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2707867,
+     49.9630559
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/10896124486",
+   "properties": {
+    "@id": "node/10896124486",
+    "access": "yes",
+    "emergency": "defibrillator",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.8495153,
+     49.8958795
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/10937190598",
+   "properties": {
+    "@id": "node/10937190598",
+    "access": "yes",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "level": "0",
+    "opening_hours": "24/7",
+    "wheelchair": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2408835,
+     50.1095577
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11138482751",
+   "properties": {
+    "@id": "node/11138482751",
+    "access": "yes",
+    "defibrillator:location": "Angebracht an der Außenwand des Feuerwehrhauses neben dem Briefkasten",
+    "emergency": "defibrillator"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.9829967,
+     49.7254944
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11148274740",
+   "properties": {
+    "@id": "node/11148274740",
+    "access": "yes",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "level": "0",
+    "opening_hours": "24/7",
+    "wheelchair": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.0098407,
+     49.7446949
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11230642151",
+   "properties": {
+    "@id": "node/11230642151",
+    "access": "yes",
+    "emergency": "defibrillator",
+    "image": "https://back.openaedmap.org/api/v1/photos/view/HBmWLL9Mixb7udLUqLbVaw.webp",
+    "image:license": "CC0",
+    "level": "0",
+    "opening_hours": "24/7",
+    "wheelchair": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2695336,
+     49.8048186
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11232492845",
+   "properties": {
+    "@id": "node/11232492845",
+    "access": "yes",
+    "defibrillator:location": "Dorfplatz",
+    "emergency": "defibrillator",
+    "image": "https://back.openaedmap.org/api/v1/photos/view/2DQJ6KWv0mEsd3uepVvZIA.webp",
+    "image:license": "CC0",
+    "indoor": "yes",
+    "level": "0",
+    "opening_hours": "24/7"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2788535,
+     49.8132731
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11249150458",
+   "properties": {
+    "@id": "node/11249150458",
+    "access": "yes",
+    "addr:city": "Greimerath",
+    "addr:country": "DE",
+    "addr:housenumber": "1",
+    "addr:postcode": "54533",
+    "addr:street": "Im Oberdorf",
+    "defibrillator:location": "An der Wand des Feuerwehrhauses",
+    "emergency": "defibrillator",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.9079699,
+     50.0406853
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11274601793",
+   "properties": {
+    "@id": "node/11274601793",
+    "access": "yes",
+    "defibrillator:location": "SpVgg Mülheim-Brauneberg e.V. - Outdoorgerät, Links neben Geräteraum / Verkaufsstand",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "opening_hours": "\"Täglich zu den Trainings- und Spielbetriebszeiten\"",
+    "operator": "Björn Steiger Stiftung",
+    "operator:wikidata": "Q879521",
+    "operator:wikipedia": "de:Björn Steiger Stiftung",
+    "ref": "3412"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.0028805,
+     49.9101868
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11302422535",
+   "properties": {
+    "@id": "node/11302422535",
+    "defibrillator:location": "Außen am Gebäude, links neben der Tür zum Supermarkt. // Outside the building, left of the entrance to the supermarket.",
+    "emergency": "defibrillator"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.879387,
+     49.8190894
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11402698347",
+   "properties": {
+    "@id": "node/11402698347",
+    "access": "yes",
+    "defibrillator:location": "hinter der Haupteingangstür (von der Straße aus) direkt links hinter der Tür",
+    "emergency": "defibrillator",
+    "indoor": "yes",
+    "operator": "Gemeinde Leisel"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2006168,
+     49.7189781
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11408758573",
+   "properties": {
+    "@id": "node/11408758573",
+    "access": "yes",
+    "defibrillator:location": "Hängt an der Hauswand",
+    "emergency": "defibrillator",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.181695,
+     50.0254048
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11665434812",
+   "properties": {
+    "@id": "node/11665434812",
+    "access": "customers",
+    "check_date": "2024-03-01",
+    "defibrillator:location": "Im linken Flur, vor Lehrsaal Malta (Raum 1.08) in einem Wandschrank",
+    "defibrillator:location:de": "Im linken Flur der Diözesangeschäftsstelle des Malteser Hilfsdienstes vor Lehrsaal Malta (Raum 1.08) in einem Wandschrank",
+    "emergency": "defibrillator",
+    "image": "https://openaedmap.org/api/v1/photos/view/AYhhjEkaRJ5K0cYdQj6rNw.webp",
+    "image:license": "CC0",
+    "indoor": "yes",
+    "level": "1",
+    "opening_hours": "Mo-Th 09:00-12:00,13:00-17:00; Fr 09:00-12:30; PH closed",
+    "operator": "Malteser Hilfsdienst e.V.",
+    "phone": "+49 651 146480",
+    "wheelchair": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.6691981,
+     49.7683276
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11665434813",
+   "properties": {
+    "@id": "node/11665434813",
+    "access": "customers",
+    "check_date": "2024-03-01",
+    "defibrillator:location": "Im Haupteingangsbereich auf der rechten Seite in einem Wandkasten (neben der Tür zu den WCs)",
+    "defibrillator:location:de": "Im Haupteingangsbereich zum Globus Baumarkt auf der rechten Seite in einem Wandkasten (neben der Tür zu den WCs)",
+    "emergency": "defibrillator",
+    "image": "https://openaedmap.org/api/v1/photos/view/UxlwgcjNbytrwTmIdhrg1w.webp",
+    "image:license": "CC0",
+    "indoor": "yes",
+    "level": "0",
+    "opening_hours": "Mo-Sa 08:00-20:00; PH closed",
+    "operator": "Globus Baumarkt",
+    "phone": "+49 651 46050",
+    "wheelchair": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.6612321,
+     49.7715925
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11677114636",
+   "properties": {
+    "@id": "node/11677114636",
+    "access": "yes",
+    "defibrillator:location": "Außenwand von Feuerwehrgebäude.",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "opening_hours": "24/7"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.1037625,
+     49.9768662
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11684829369",
+   "properties": {
+    "@id": "node/11684829369",
+    "check_date": "2024-03-02",
+    "emergency": "defibrillator",
+    "indoor": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.6739463,
+     49.7707698
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11684830369",
+   "properties": {
+    "@id": "node/11684830369",
+    "check_date": "2024-03-02",
+    "emergency": "defibrillator",
+    "indoor": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.6766236,
+     49.7748004
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11684830371",
+   "properties": {
+    "@id": "node/11684830371",
+    "check_date": "2024-03-02",
+    "emergency": "defibrillator"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.6925662,
+     49.7251051
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11684831769",
+   "properties": {
+    "@id": "node/11684831769",
+    "check_date": "2024-03-02",
+    "emergency": "defibrillator"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.6885852,
+     49.7745855
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11684831770",
+   "properties": {
+    "@id": "node/11684831770",
+    "check_date": "2024-03-02",
+    "emergency": "defibrillator"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.6853458,
+     49.791657
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11684835369",
+   "properties": {
+    "@id": "node/11684835369",
+    "access": "customers",
+    "check_date": "2024-03-04",
+    "defibrillator:location:de": "Im Beruflichen Trainingszentrum Trier hinter der Eingangstür",
+    "emergency": "defibrillator",
+    "image": "https://openaedmap.org/api/v1/photos/view/Uh6HTo34zgHN0U6MzRlfVg.webp",
+    "image:license": "CC0",
+    "indoor": "yes",
+    "level": "0",
+    "opening_hours": "Mo-Fr 08:00-17:00; PH closed",
+    "operator": "Berufliches Trainingszentrum Trier",
+    "phone": "+49 651 9917090",
+    "wheelchair": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.6677046,
+     49.7548357
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11684837369",
+   "properties": {
+    "@id": "node/11684837369",
+    "check_date": "2024-03-02",
+    "emergency": "defibrillator",
+    "indoor": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.6695234,
+     49.7554396
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11684842669",
+   "properties": {
+    "@id": "node/11684842669",
+    "access": "customers",
+    "check_date": "2024-03-04",
+    "defibrillator:location:de": "Im Dolce Vita Restaurant (Sportzentrum Tarforst) bei der Theke",
+    "emergency": "defibrillator",
+    "image": "https://openaedmap.org/api/v1/photos/view/qv_XCHbbP7kXJPLqLTdUyA.webp",
+    "image:license": "CC0",
+    "indoor": "yes",
+    "level": "0",
+    "opening_hours": "Mo,Th-Fr 11:30-24:00; Tu-We,Sa 10:00-24:00; Su 10:00-22:30; PH open \"10:00-22:30\"",
+    "operator": "FSV Trier-Tarforst",
+    "phone": "+49 651 9955778",
+    "wheelchair": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.6940828,
+     49.7424622
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11684844370",
+   "properties": {
+    "@id": "node/11684844370",
+    "check_date": "2024-03-02",
+    "emergency": "defibrillator",
+    "indoor": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.6833291,
+     49.7287327
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11684852469",
+   "properties": {
+    "@id": "node/11684852469",
+    "check_date": "2024-03-02",
+    "emergency": "defibrillator",
+    "indoor": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.655443,
+     49.7305156
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11684979469",
+   "properties": {
+    "@id": "node/11684979469",
+    "check_date": "2024-03-02",
+    "emergency": "defibrillator",
+    "indoor": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.6583882,
+     49.7686132
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11684981470",
+   "properties": {
+    "@id": "node/11684981470",
+    "check_date": "2024-03-02",
+    "emergency": "defibrillator",
+    "indoor": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.677033,
+     49.787336
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11684981572",
+   "properties": {
+    "@id": "node/11684981572",
+    "check_date": "2024-03-02",
+    "emergency": "defibrillator",
+    "indoor": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.6870085,
+     49.7460748
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11684981573",
+   "properties": {
+    "@id": "node/11684981573",
+    "check_date": "2024-03-02",
+    "emergency": "defibrillator",
+    "indoor": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.6892375,
+     49.7424647
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11684981574",
+   "properties": {
+    "@id": "node/11684981574",
+    "access": "customers",
+    "check_date": "2024-03-02",
+    "emergency": "defibrillator",
+    "indoor": "yes",
+    "level": "0",
+    "opening_hours": "Tu 08:00-13:00; Th 14:30-18:00; PH closed",
+    "operator": "Trimmelter Sportverein Trier e.V.",
+    "phone": "+49 651 15100",
+    "wheelchair": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.6934783,
+     49.7434472
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11684981769",
+   "properties": {
+    "@id": "node/11684981769",
+    "access": "customers",
+    "check_date": "2024-03-06",
+    "defibrillator:location:de": "An der Betonsäule vor der Kunden-Info des Edeka-Centers (Ratio Einkaufszentrum)",
+    "emergency": "defibrillator",
+    "image": "https://openaedmap.org/api/v1/photos/view/S6A_-5Mbqg0qXRGuWUSusA.webp",
+    "image:license": "CC0",
+    "indoor": "yes",
+    "level": "0",
+    "opening_hours": "Mo-Sa 08:00-22:00; PH closed",
+    "operator": "Edeka-Center Trier",
+    "phone": "+49 651 27020",
+    "wheelchair": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.6620461,
+     49.7730266
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11684981770",
+   "properties": {
+    "@id": "node/11684981770",
+    "access": "yes",
+    "check_date": "2026-08-23",
+    "defibrillator:location:de": "An der Front an der Hausseite zum Parkplatz",
+    "emergency": "defibrillator",
+    "image": "https://openaedmap.org/api/v1/photos/view/Mznr-sqxCVbA_l69IxaewA.webp",
+    "image:license": "CC0",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.7425909,
+     49.7495574
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11684983369",
+   "properties": {
+    "@id": "node/11684983369",
+    "access": "customers",
+    "check_date": "2025-04-10",
+    "defibrillator:location:de": "Eingangsbereich, zwischen beiden Türen",
+    "emergency": "defibrillator",
+    "indoor": "yes",
+    "phone": "+49 651 2070"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.680339,
+     49.7754168
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11684987469",
+   "properties": {
+    "@id": "node/11684987469",
+    "check_date": "2024-03-02",
+    "emergency": "defibrillator",
+    "indoor": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.687631,
+     49.7958064
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11685007469",
+   "properties": {
+    "@id": "node/11685007469",
+    "access": "customers",
+    "check_date": "2026-07-26",
+    "defibrillator:location:de": "Hinter dem Eingang zum Gebäude F. Ausserhalb der Unterrichtszeiten verschlossen.",
+    "emergency": "defibrillator",
+    "image": "https://openaedmap.org/api/v1/photos/view/O2Rd0PDzAvfi_i3Pu9pLBQ.webp",
+    "image:license": "CC0",
+    "indoor": "yes",
+    "level": "1"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.6751342,
+     49.747997
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11685008669",
+   "properties": {
+    "@id": "node/11685008669",
+    "access": "customers",
+    "check_date": "2024-03-04",
+    "defibrillator:location:de": "Im Orthopädicum Trier (2. OG rechts im Ärztehaus Petrisberg) im Flur der Rezeption",
+    "emergency": "defibrillator",
+    "image": "https://openaedmap.org/api/v1/photos/view/jwUiPXmmQgH-RyrOrLq_8g.webp",
+    "image:license": "CC0",
+    "indoor": "yes",
+    "level": "2",
+    "opening_hours": "Mo-Th 08:00-11:00,13:00-16:00; Fr 08:00-13:00; PH closed",
+    "operator": "Orthopädicum Trier",
+    "phone": "+49 651 9945800",
+    "wheelchair": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.6706786,
+     49.7561825
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11691199069",
+   "properties": {
+    "@id": "node/11691199069",
+    "check_date": "2024-03-04",
+    "emergency": "defibrillator"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.6555833,
+     49.7572999
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11765765393",
+   "properties": {
+    "@id": "node/11765765393",
+    "emergency": "defibrillator"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2864823,
+     50.0062479
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11773360420",
+   "properties": {
+    "@id": "node/11773360420",
+    "access": "yes",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "level": "0"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.9667943,
+     49.743667
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11782576969",
+   "properties": {
+    "@id": "node/11782576969",
+    "access": "permit",
+    "check_date": "2024-10-06",
+    "defibrillator:location:de": "Eingangsflur vor Sekretariat",
+    "emergency": "defibrillator",
+    "indoor": "yes",
+    "phone": "+49 651 9679810"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.6778424,
+     49.7884848
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11782580871",
+   "properties": {
+    "@id": "node/11782580871",
+    "access": "private",
+    "check_date": "2024-04-03",
+    "defibrillator:location:de": "Verwaltungsflur neben Sekretariat",
+    "emergency": "defibrillator",
+    "indoor": "yes",
+    "phone": "+49 6502 9978620"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.7500834,
+     49.8180829
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11782618969",
+   "properties": {
+    "@id": "node/11782618969",
+    "access": "private",
+    "check_date": "2024-04-03",
+    "defibrillator:location:de": "Verwaltungsflur neben Sekretariat",
+    "emergency": "defibrillator",
+    "indoor": "yes",
+    "level": "1",
+    "phone": "+49 6502 93980"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.7470769,
+     49.8168443
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11782623969",
+   "properties": {
+    "@id": "node/11782623969",
+    "access": "private",
+    "check_date": "2024-04-03",
+    "defibrillator:location:de": "Verwaltungsflur der Meulenwald-Schule",
+    "emergency": "defibrillator",
+    "indoor": "yes",
+    "phone": "+49 6502 910950"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.7497828,
+     49.8224295
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/11782732969",
+   "properties": {
+    "@id": "node/11782732969",
+    "access": "customers",
+    "check_date": "2024-10-06",
+    "defibrillator:location": "Im verschlossenen Gebäude, recht vom Eingang an der Wand. Von aussen sichtbar.",
+    "defibrillator:location:de": "Im Treppenhaus des THW neben der Eingangstüre",
+    "emergency": "defibrillator",
+    "image": "https://openaedmap.org/api/v1/photos/view/b39eOUDtp5UzbqRWw8FHfg.webp",
+    "image:license": "CC0",
+    "indoor": "yes",
+    "level": "0",
+    "operator": "Bundesanstalt Technisches Hilfswerk",
+    "operator:short": "THW",
+    "operator:wikidata": "Q697698",
+    "phone": "+49 651 8249800"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.6887166,
+     49.8033565
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/12061407469",
+   "properties": {
+    "@id": "node/12061407469",
+    "access": "yes",
+    "check_date": "2026-06-20",
+    "defibrillator:location": "Gemeindehaus - im Innenraum Rechtsseitig an der Wand neben dem Eingang",
+    "defibrillator:location:de": "Rechtsseitig an der Wand hinter dem Eingang im Innenbereich",
+    "emergency": "defibrillator",
+    "image": "https://back.openaedmap.org/api/v1/photos/view/2F-42YLy5M6vp4EIjBWFCw.webp",
+    "image:license": "CC0",
+    "indoor": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.244325,
+     49.7890351
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/12083277469",
+   "properties": {
+    "@id": "node/12083277469",
+    "access": "yes",
+    "check_date": "2026-06-24",
+    "defibrillator:location:de": "Unmittelbar an der Wand neben dem Eingang rechts.",
+    "emergency": "defibrillator",
+    "indoor": "yes",
+    "level": "0"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.1972719,
+     49.7756058
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/12100784601",
+   "properties": {
+    "@id": "node/12100784601",
+    "defibrillator:location": "an der Gebäudewand zwischen Rolltor und WC Herren;durch Drehkreuz erreichbar, auch wenn der Platz nicht bespielt wird",
+    "emergency": "defibrillator",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.919181,
+     49.8801701
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/12159790028",
+   "properties": {
+    "@id": "node/12159790028",
+    "access": "yes",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "opening_hours": "24/7",
+    "panoramax": "37dd2ea7-69ab-4298-9c10-e88f87f86b20",
+    "survey:date": "2024-09-06",
+    "wheelchair": "limited"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2389341,
+     50.1101653
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/12159963085",
+   "properties": {
+    "@id": "node/12159963085",
+    "access": "yes",
+    "defibrillator:location": "Wartehäuschen Bushaltestelle",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "panoramax": "61fc0e69-f1a8-4e67-b26c-89960067c332",
+    "wheelchair": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.1698343,
+     50.0398344
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/12189847064",
+   "properties": {
+    "@id": "node/12189847064",
+    "covered": "yes",
+    "defibrillator:location": "Links neben den Garagentoren, in dem Unterstand an der Wand",
+    "emergency": "defibrillator"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.9554223,
+     50.1473426
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/12478688392",
+   "properties": {
+    "@id": "node/12478688392",
+    "defibrillator:location": "an der Außenwand des Gemeindesaals",
+    "emergency": "defibrillator",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2704808,
+     49.9383495
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/12557370841",
+   "properties": {
+    "@id": "node/12557370841",
+    "access": "yes",
+    "check_date": "2025-08-25",
+    "defibrillator:location": "An Außenwand links neben dem Eingang.",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "opening_hours": "24/7",
+    "source": "survey"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.1163418,
+     49.9509325
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/12733258136",
+   "properties": {
+    "@id": "node/12733258136",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "opening_hours": "24/7",
+    "source": "local knowledge"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.9044114,
+     49.9523833
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/12744072601",
+   "properties": {
+    "@id": "node/12744072601",
+    "access": "customers",
+    "check_date": "2025-04-10",
+    "defibrillator:location:de": "Eingang Neubau, links neben der zweiten Tür",
+    "emergency": "defibrillator",
+    "indoor": "yes",
+    "phone": "+49 651 2070"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.6817987,
+     49.7750313
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/12744073101",
+   "properties": {
+    "@id": "node/12744073101",
+    "access": "yes",
+    "check_date": "2026-08-23",
+    "defibrillator:location:de": "Tore Fahrzeughalle",
+    "emergency": "defibrillator",
+    "image": "https://openaedmap.org/api/v1/photos/view/tWrR_K_Gfql04R0AAmkVOQ.webp",
+    "image:license": "CC0",
+    "indoor": "no",
+    "phone": "+49 6502 5911"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.7510243,
+     49.817289
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/12755454099",
+   "properties": {
+    "@id": "node/12755454099",
+    "access": "yes",
+    "defibrillator:location": "Vor dem Haupteingang",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "operator": "Ortsgemeinde Oberbrombach"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2626003,
+     49.7003299
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/12822463101",
+   "properties": {
+    "@id": "node/12822463101",
+    "access": "yes",
+    "defibrillator:location": "Friedrich-Karl-Ströher Saal",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "operator": "Gemeinde Irmenach"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.1874793,
+     49.9244242
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/12822463501",
+   "properties": {
+    "@id": "node/12822463501",
+    "access": "yes",
+    "defibrillator:location": "Museeum Beuren",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "operator": "Gemeinde Irmenach"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.185153,
+     49.9153585
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/12950097408",
+   "properties": {
+    "@id": "node/12950097408",
+    "access": "yes",
+    "defibrillator:location": "Neben Eingangstür Touristinformation",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "operator": "Ortsgemeinde Brauneberg"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.9829931,
+     49.9083646
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/12951547722",
+   "properties": {
+    "@id": "node/12951547722",
+    "access": "yes",
+    "defibrillator:location": "Waldstadion Laufeld - Außenwandkasten Links neben einer Eingangstür zum Sportlerheim",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "opening_hours": "24/7",
+    "operator": "Björn Steiger Stiftung",
+    "operator:wikidata": "Q879521",
+    "operator:wikipedia": "de:Björn Steiger Stiftung",
+    "ref": "3489"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.8653802,
+     50.074061
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/12966345689",
+   "properties": {
+    "@id": "node/12966345689",
+    "access:conditional": "yes @ opening_hours",
+    "defibrillator:location": "Friedrich-Spee-Realschule - Verwaltungstrakt Sekretariat",
+    "emergency": "defibrillator",
+    "indoor": "yes",
+    "operator": "Björn Steiger Stiftung",
+    "operator:wikidata": "Q879521",
+    "operator:wikipedia": "de:Björn Steiger Stiftung",
+    "ref": "3530"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.8985338,
+     49.8582409
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/12992410502",
+   "properties": {
+    "@id": "node/12992410502",
+    "access": "yes",
+    "defibrillator:location": "Pünderich Grundschule",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "opening_hours": "24/7",
+    "operator": "Gemeinde Pünderich"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.1270072,
+     50.0412402
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13001574139",
+   "properties": {
+    "@id": "node/13001574139",
+    "access": "yes",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "opening_hours": "24/7"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.8451551,
+     50.1099948
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13140610591",
+   "properties": {
+    "@id": "node/13140610591",
+    "check_date": "2025-09-13",
+    "defibrillator:location": "direkt am Gebäudeeingang",
+    "emergency": "defibrillator",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.0404376,
+     49.9417256
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13144634499",
+   "properties": {
+    "@id": "node/13144634499",
+    "access": "yes",
+    "defibrillator:location": "Integrierte Gesamtschule Salmtal -",
+    "emergency": "defibrillator",
+    "indoor": "yes",
+    "opening_hours": "\"zu den Schulzeiten\"",
+    "operator": "Björn Steiger Stiftung",
+    "operator:wikidata": "Q879521",
+    "operator:wikipedia": "de:Björn Steiger Stiftung",
+    "ref": "3731"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.837391,
+     49.9282021
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13146918195",
+   "properties": {
+    "@id": "node/13146918195",
+    "access": "yes",
+    "defibrillator:location": "Integrierte Gesamtschule Morbach -",
+    "emergency": "defibrillator",
+    "indoor": "yes",
+    "opening_hours": "\"zu den Schulzeiten\"",
+    "operator": "Björn Steiger Stiftung",
+    "operator:wikidata": "Q879521",
+    "operator:wikipedia": "de:Björn Steiger Stiftung",
+    "ref": "4039"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.1287354,
+     49.8128116
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13232793570",
+   "properties": {
+    "@id": "node/13232793570",
+    "access": "yes",
+    "defibrillator:location": "Schule am Pulvermaar -",
+    "emergency": "defibrillator",
+    "indoor": "yes",
+    "opening_hours": "\"zu den Schulzeiten\"",
+    "operator": "Björn Steiger Stiftung",
+    "operator:wikidata": "Q879521",
+    "operator:wikipedia": "de:Björn Steiger Stiftung",
+    "ref": "4278"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.9047139,
+     50.1297938
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13241505656",
+   "properties": {
+    "@id": "node/13241505656",
+    "access": "yes",
+    "defibrillator:location": "Außen an der Feuerwehr",
+    "emergency": "defibrillator",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.9539886,
+     49.9513772
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13254446230",
+   "properties": {
+    "@id": "node/13254446230",
+    "access": "yes",
+    "defibrillator:location": "Nikolaus-von-Kues-Gymnasium -",
+    "emergency": "defibrillator",
+    "indoor": "yes",
+    "opening_hours": "\"zu den Schulzeiten\"",
+    "operator": "Björn Steiger Stiftung",
+    "operator:wikidata": "Q879521",
+    "operator:wikipedia": "de:Björn Steiger Stiftung",
+    "ref": "4459"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.0647917,
+     49.9242228
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13353511801",
+   "properties": {
+    "@id": "node/13353511801",
+    "access": "yes",
+    "defibrillator:location": "Außenwand des Gebäude der Verbandsgemeinde ",
+    "emergency": "defibrillator",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.9986802,
+     49.7519397
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13389246801",
+   "properties": {
+    "@id": "node/13389246801",
+    "defibrillator:location": "At the stairs down to the toilets",
+    "emergency": "defibrillator",
+    "indoor": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.8998508,
+     49.6899788
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13391072531",
+   "properties": {
+    "@id": "node/13391072531",
+    "emergency": "defibrillator",
+    "indoor": "yes",
+    "opening_hours": "Mo-Sa 08:00-20:00; PH closed",
+    "operator": "Globus"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.660681,
+     49.7715897
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13607253871",
+   "properties": {
+    "@id": "node/13607253871",
+    "access": "yes",
+    "check_date": "2026-08-27",
+    "defibrillator:location": "Außen an der Fassade",
+    "defibrillator:location:de": "Links neben dem Sparkasseneingang",
+    "emergency": "defibrillator",
+    "image": "https://openaedmap.org/api/v1/photos/view/UHKDGuDOv-1-ag7B_e0hAA.webp",
+    "image:license": "CC0",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.6853362,
+     49.8076183
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13624682801",
+   "properties": {
+    "@id": "node/13624682801",
+    "access": "yes",
+    "defibrillator:location": "Defibrillator Bürgerhaus Maring",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "operator": "Ortsgemeinde Maring-Noviand"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.0006202,
+     49.9256496
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13624684001",
+   "properties": {
+    "@id": "node/13624684001",
+    "access": "yes",
+    "defibrillator:location": "Defibrillator Haus Aura Noviand",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "operator": "Ortsgemeinde Maring-Noviand"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.9869791,
+     49.9294375
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13666341832",
+   "properties": {
+    "@id": "node/13666341832",
+    "access": "yes",
+    "defibrillator:location": "Außen an der Sparkasse, links vom Eingang, früher war hier ein Geldautomat",
+    "emergency": "defibrillator",
+    "image": "https://openaedmap.org/api/v1/photos/view/DdMOSw2CE-_vqiS35mSxRA.webp",
+    "image:license": "CC0",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.6953424,
+     49.7389308
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13680109702",
+   "properties": {
+    "@id": "node/13680109702",
+    "access": "yes",
+    "defibrillator:location": "Gemeindehaus / Garage",
+    "emergency": "defibrillator",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.7770501,
+     50.1253472
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13852426202",
+   "properties": {
+    "@id": "node/13852426202",
+    "access": "yes",
+    "defibrillator:location": "Defibrillator ",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "opening_hours": "24/7",
+    "operator": "Freiwillige Feuerwehr Bruttig-Fankel "
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2310972,
+     50.1298984
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13926992601",
+   "properties": {
+    "@id": "node/13926992601",
+    "access": "yes",
+    "defibrillator:location": "Feuerwehrhaus Niederbrombach",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "opening_hours": "24/7"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2424116,
+     49.6874232
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13926995302",
+   "properties": {
+    "@id": "node/13926995302",
+    "access": "yes",
+    "defibrillator:location": "Dorfladen EMMA ",
+    "emergency": "defibrillator",
+    "indoor": "yes",
+    "opening_hours": "24/7"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2165594,
+     49.679341
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13926995901",
+   "properties": {
+    "@id": "node/13926995901",
+    "access": "yes",
+    "defibrillator:location": "Gemeinschaftshaus Siesbach / Bushaltestelle Außenkasten",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "opening_hours": "24/7"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2397227,
+     49.7302846
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13926997401",
+   "properties": {
+    "@id": "node/13926997401",
+    "access": "yes",
+    "defibrillator:location": "Feuerwehrhaus Mackenrodt Außenkasten",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "opening_hours": "24/7"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2551008,
+     49.7249053
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13926997402",
+   "properties": {
+    "@id": "node/13926997402",
+    "access": "yes",
+    "defibrillator:location": "Sparkasse Tiefenstein",
+    "emergency": "defibrillator",
+    "image": "https://back.openaedmap.org/api/v1/photos/view/74rfYfqyajOqSXSruUEhCg.webp",
+    "image:license": "CC0",
+    "indoor": "yes",
+    "opening_hours": "05:30-23:00"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2759777,
+     49.7463564
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13926998701",
+   "properties": {
+    "@id": "node/13926998701",
+    "access": "yes",
+    "defibrillator:location": "Dorfladen Hettenrodt Außenkasten Parkplatz",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "opening_hours": "24/7"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2535592,
+     49.739758
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13927001801",
+   "properties": {
+    "@id": "node/13927001801",
+    "access": "yes",
+    "defibrillator:location": "Dorfladen EMMA ",
+    "emergency": "defibrillator",
+    "indoor": "yes",
+    "opening_hours": "24/7"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2165594,
+     49.679341
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13927008303",
+   "properties": {
+    "@id": "node/13927008303",
+    "access": "customers",
+    "defibrillator:location": "Stadenhalle Haupteingang im Flur hinten rechts",
+    "emergency": "defibrillator",
+    "indoor": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2695768,
+     49.7519404
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13927011501",
+   "properties": {
+    "@id": "node/13927011501",
+    "access": "yes",
+    "defibrillator:location": "Infohäuschen/Bushaltestelle Außenkasten",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "opening_hours": "24/7"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2210684,
+     49.7056072
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13927013601",
+   "properties": {
+    "@id": "node/13927013601",
+    "access": "yes",
+    "defibrillator:location": "Häuschen am Kelterweg Außenkasten",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "opening_hours": "24/7"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2005386,
+     49.672413
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13927885901",
+   "properties": {
+    "@id": "node/13927885901",
+    "access": "yes",
+    "defibrillator:location": "Vereinshalle Grillstelle CODE 1515",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "opening_hours": "24/7"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.1834502,
+     49.7042647
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13929552304",
+   "properties": {
+    "@id": "node/13929552304",
+    "access": "yes",
+    "check_date": "2026-06-11",
+    "defibrillator:location:de": "Links neben dem roten Garagentor",
+    "emergency": "defibrillator"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.8055987,
+     49.7409909
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13929670901",
+   "properties": {
+    "@id": "node/13929670901",
+    "access": "no",
+    "defibrillator:location": "Grillhaus Sportplatz VfL Algenrodt (temporär nicht verfügbar)",
+    "emergency": "defibrillator",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.289921,
+     49.7127598
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13929672301",
+   "properties": {
+    "@id": "node/13929672301",
+    "access": "yes",
+    "defibrillator:location": "Feuerwehrhaus",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "opening_hours": "24/7"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2279846,
+     49.7000248
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13929676001",
+   "properties": {
+    "@id": "node/13929676001",
+    "access": "yes",
+    "defibrillator:location": "Feuerwehrhaus",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "opening_hours": "24/7"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.1585965,
+     49.6987031
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13938678302",
+   "properties": {
+    "@id": "node/13938678302",
+    "access": "yes",
+    "defibrillator:location": "Schlachthaus - Wandkasten neben Tür",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "opening_hours": "24/7"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2037765,
+     49.6650487
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13938679401",
+   "properties": {
+    "@id": "node/13938679401",
+    "access": "yes",
+    "defibrillator:location": "FW-Gerätehaus - neben Garage ",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "opening_hours": "24/7"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.207603,
+     49.6565642
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13940096501",
+   "properties": {
+    "@id": "node/13940096501",
+    "access": "yes",
+    "check_date": "2026-06-15",
+    "defibrillator:location:de": "Links neben dem Haupteingang",
+    "emergency": "defibrillator",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.9527029,
+     49.7608104
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13946191602",
+   "properties": {
+    "@id": "node/13946191602",
+    "access": "yes",
+    "check_date": "2026-06-16",
+    "defibrillator:location:de": "Neben Eingang vom Feuerwehrhaus",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "phone": "+49 6588 5649978"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.7121417,
+     49.6916014
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13946198901",
+   "properties": {
+    "@id": "node/13946198901",
+    "access": "yes",
+    "check_date": "2026-06-16",
+    "defibrillator:location:de": "Vor dem Eingangsbereich zum Bürgerhaus",
+    "emergency": "defibrillator",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.7206041,
+     49.6981667
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13946213301",
+   "properties": {
+    "@id": "node/13946213301",
+    "access": "yes",
+    "defibrillator:location": "Gemeindehaus Bruchweiler Außenkasten am Eingang",
+    "emergency": "defibrillator",
+    "image": "https://back.openaedmap.org/api/v1/photos/view/L3Sdikhk9PD666hGh8ExbA.webp",
+    "image:license": "CC0",
+    "indoor": "no",
+    "opening_hours": "24/7"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2228196,
+     49.7994799
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13951688101",
+   "properties": {
+    "@id": "node/13951688101",
+    "access": "yes",
+    "check_date": "2026-06-19",
+    "defibrillator:location:de": "Im überdachten Bereich, direkt neben der Sitzbank.",
+    "emergency": "defibrillator",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.0203331,
+     50.0889633
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13953717203",
+   "properties": {
+    "@id": "node/13953717203",
+    "access": "yes",
+    "defibrillator:location": "Kindergarten- Aussenwandkasten rechts am Gebäude zur Straße hin",
+    "emergency": "defibrillator",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2894535,
+     49.8466482
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13953717301",
+   "properties": {
+    "@id": "node/13953717301",
+    "access": "yes",
+    "defibrillator:location": "Sportheim Schauren - Außenkasten",
+    "emergency": "defibrillator",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2348075,
+     49.8034259
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13953717401",
+   "properties": {
+    "@id": "node/13953717401",
+    "access": "yes",
+    "defibrillator:location": "Sportheim Schauren - Außenkasten",
+    "emergency": "defibrillator",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2348075,
+     49.8034259
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13958442601",
+   "properties": {
+    "@id": "node/13958442601",
+    "access": "yes",
+    "defibrillator:location": "Gemeindehaus im Vorraum hinter der Tür - Grüner Kasten",
+    "emergency": "defibrillator",
+    "indoor": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2887813,
+     49.6719647
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13961265101",
+   "properties": {
+    "@id": "node/13961265101",
+    "access": "yes",
+    "defibrillator:location": "Am Gemeindehaus Außenkasten zur Straße hin",
+    "emergency": "defibrillator",
+    "image": "https://back.openaedmap.org/api/v1/photos/view/5LeyDYB5yPjK6H2msFOByQ.webp",
+    "image:license": "CC0",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2747406,
+     49.8209705
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13961757201",
+   "properties": {
+    "@id": "node/13961757201",
+    "access": "yes",
+    "defibrillator:location": "Kinderheim Leisel - bei der Garage an der Hausfront",
+    "emergency": "defibrillator",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.207752,
+     49.7189419
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13965751601",
+   "properties": {
+    "@id": "node/13965751601",
+    "access": "yes",
+    "check_date": "2026-06-25",
+    "defibrillator:location:de": "Gwetschestube Winnenberg Außenwandkasten",
+    "emergency": "defibrillator",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2752337,
+     49.6813591
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13968932702",
+   "properties": {
+    "@id": "node/13968932702",
+    "access": "yes",
+    "defibrillator:location": "Gemeindehaus - hinter der roten Hütte an der Wand ",
+    "emergency": "defibrillator",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2047303,
+     49.6827074
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13968951001",
+   "properties": {
+    "@id": "node/13968951001",
+    "access": "yes",
+    "defibrillator:location": "FW-Gerätehaus an der Garage Außenkasten. Direkt an der Straße - nicht hochfahren.",
+    "emergency": "defibrillator",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2813926,
+     49.6724911
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13968952801",
+   "properties": {
+    "@id": "node/13968952801",
+    "access": "yes",
+    "defibrillator:location": "Gemeindehaus - Unter dem Vordach an der Wand",
+    "emergency": "defibrillator",
+    "image": "https://back.openaedmap.org/api/v1/photos/view/R2ZGfxBfaejxnPUyRCO5Lw.webp",
+    "image:license": "CC0",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.1607082,
+     49.686159
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13968953101",
+   "properties": {
+    "@id": "node/13968953101",
+    "access": "yes",
+    "defibrillator:location": "Clubhaus / Bücherei - in der Bücherei - Tür offen",
+    "emergency": "defibrillator",
+    "indoor": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.1590665,
+     49.6722827
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13968953901",
+   "properties": {
+    "@id": "node/13968953901",
+    "access": "yes",
+    "defibrillator:location": "Holzhütte am Brunnen - in der hinteren Holzhütte an der Wand",
+    "emergency": "defibrillator",
+    "image": "https://back.openaedmap.org/api/v1/photos/view/I31ffF73erNSzLPhvkSSvg.webp",
+    "image:license": "CC0",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.1478482,
+     49.6594883
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13993306570",
+   "properties": {
+    "@id": "node/13993306570",
+    "access": "yes",
+    "defibrillator:location": "draußen angebracht, überdacht",
+    "defibrillator:location:de": "an der Wand des Waschhauses.",
+    "emergency": "defibrillator",
+    "image": "https://openaedmap.org/api/v1/photos/view/Sod9KoIi4IM2hWXmWsDBHA.webp",
+    "image:license": "CC0",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.7092904,
+     49.7364381
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13993372332",
+   "properties": {
+    "@id": "node/13993372332",
+    "access": "yes",
+    "check_date": "2026-07-11",
+    "defibrillator:location:de": "im Durchgang nach draussen, links an der Wand",
+    "emergency": "defibrillator",
+    "image": "https://openaedmap.org/api/v1/photos/view/28HqXvwvvQBP2Zd3ieGpUw.webp",
+    "image:license": "CC0",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.6878124,
+     49.7432077
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13995984101",
+   "properties": {
+    "@id": "node/13995984101",
+    "access": "yes",
+    "check_date": "2026-07-07",
+    "defibrillator:location:de": "Gemeindehaus - vom Schulweg aus linke Tür dort etwas versteckt in der Nische rechts - Jugendraum",
+    "emergency": "defibrillator"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.2612003,
+     49.6589481
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13996031502",
+   "properties": {
+    "@id": "node/13996031502",
+    "access": "yes",
+    "defibrillator:location": "Gemeindehaus Kronweiler - von der Schulstrasse aus linke Tür - sehr versteckt in der Nische / Jugendeaum",
+    "emergency": "defibrillator",
+    "image": "https://back.openaedmap.org/api/v1/photos/view/U7H_JKadznARV2qzdMDjVQ.webp",
+    "image:license": "CC0",
+    "indoor": "no",
+    "opening_hours": "24/7"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.261202,
+     49.6589499
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13997056002",
+   "properties": {
+    "@id": "node/13997056002",
+    "access": "yes",
+    "check_date": "2026-08-05",
+    "defibrillator:location:de": "Im Eingangsbereich des Gemeindehauses",
+    "emergency": "defibrillator",
+    "indoor": "yes",
+    "level": "0"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.166866,
+     49.7557579
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/13998224401",
+   "properties": {
+    "@id": "node/13998224401",
+    "access": "yes",
+    "check_date": "2026-07-08",
+    "defibrillator:location": "FW-Gerätehaus an der Toilettenanlage",
+    "defibrillator:location:de": "FW-Gerätehaus",
+    "emergency": "defibrillator",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.0810084,
+     49.6907079
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/14024483001",
+   "properties": {
+    "@id": "node/14024483001",
+    "access": "yes",
+    "defibrillator:location": "FW-Gerätehaus - Straße unterhalb Gemeindehaus, gleiches Gebäude",
+    "emergency": "defibrillator",
+    "image": "https://back.openaedmap.org/api/v1/photos/view/zWkV2n-Xv85Irp5rjG33mA.webp",
+    "image:license": "CC0",
+    "indoor": "no",
+    "opening_hours": "24/7"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.1880906,
+     49.7825202
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/14024483002",
+   "properties": {
+    "@id": "node/14024483002",
+    "access": "yes",
+    "defibrillator:location": "Grillhütte am Gemeindehaus - Rechte Tür",
+    "emergency": "defibrillator",
+    "image:license": "CC0",
+    "indoor": "yes",
+    "opening_hours": "24/7"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.1736317,
+     49.7647046
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/14024484901",
+   "properties": {
+    "@id": "node/14024484901",
+    "access": "yes",
+    "defibrillator:location": "Gemeindehaus - am Haupteingang vorbeifahren, dann links an der Straße an der Wand zur Straße hin",
+    "emergency": "defibrillator",
+    "image": "https://back.openaedmap.org/api/v1/photos/view/B18gWKD-5r2QQBWRB3vfOw.webp",
+    "image:license": "CC0",
+    "indoor": "no",
+    "opening_hours": "24/7"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.1270954,
+     49.6754136
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/14024485401",
+   "properties": {
+    "@id": "node/14024485401",
+    "access": "yes",
+    "defibrillator:location": "Dorfplatz",
+    "emergency": "defibrillator",
+    "image": "https://back.openaedmap.org/api/v1/photos/view/749VRfGsGq7UwotXkvK7aQ.webp",
+    "image:license": "CC0",
+    "indoor": "no",
+    "opening_hours": "24/7"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.1199883,
+     49.6554539
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/14045114368",
+   "properties": {
+    "@id": "node/14045114368",
+    "access": "yes",
+    "check_date": "2026-08-01",
+    "defibrillator:location": "Außen am Feuerwehrhaus, links neben dem Tor",
+    "emergency": "defibrillator",
+    "image": "https://openaedmap.org/api/v1/photos/view/d2sxHKcYiRAPwZSSh4vZhQ.webp",
+    "image:license": "CC0",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.669406,
+     49.7640845
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/14069201101",
+   "properties": {
+    "@id": "node/14069201101",
+    "access": "customers",
+    "defibrillator:location": "Hunsrückhaus",
+    "emergency": "defibrillator",
+    "indoor": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.0834041,
+     49.7373658
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/14087221001",
+   "properties": {
+    "@id": "node/14087221001",
+    "access": "yes",
+    "defibrillator:location": "Eingang Sportlerheim - Außenkasten",
+    "emergency": "defibrillator",
+    "indoor": "no",
+    "opening_hours": "24/7"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.1137528,
+     49.6601966
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/14087221202",
+   "properties": {
+    "@id": "node/14087221202",
+    "access": "yes",
+    "defibrillator:location": "Am Staff-Eingang links neben der Sicherheitskontrolle im linken Gebäudeabschnitt des Terminals. Vom Tower aus gesehen die erste oder zweite Schiebetür nehmen",
+    "emergency": "defibrillator",
+    "indoor": "yes"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.269527,
+     49.9461297
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/14108138901",
+   "properties": {
+    "@id": "node/14108138901",
+    "access": "yes",
+    "check_date": "2026-08-20",
+    "defibrillator:location:de": "Links neben der Garage",
+    "emergency": "defibrillator",
+    "image": "https://openaedmap.org/api/v1/photos/view/rEzuF9wotRF4OKzmT_l8Rw.webp",
+    "image:license": "CC0",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.7248616,
+     49.8034756
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/14118478701",
+   "properties": {
+    "@id": "node/14118478701",
+    "access": "yes",
+    "check_date": "2026-08-24",
+    "defibrillator:location:de": "Links neben der Schranke",
+    "emergency": "defibrillator",
+    "image": "https://openaedmap.org/api/v1/photos/view/Mx5q9id3Rtqk4UxTlphgvQ.webp",
+    "image:license": "CC0",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.7332927,
+     49.7619999
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/14118484101",
+   "properties": {
+    "@id": "node/14118484101",
+    "access": "yes",
+    "check_date": "2026-08-24",
+    "defibrillator:location:de": "Am Garagentor",
+    "emergency": "defibrillator",
+    "image": "https://openaedmap.org/api/v1/photos/view/e56QGenUcQaFATl-21qeDg.webp",
+    "image:license": "CC0",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.741626,
+     49.7648085
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/14118510401",
+   "properties": {
+    "@id": "node/14118510401",
+    "access": "yes",
+    "check_date": "2026-08-24",
+    "defibrillator:location:de": "An der Garage auf der Seite zum Spielfeld.",
+    "emergency": "defibrillator",
+    "image": "https://openaedmap.org/api/v1/photos/view/XuIAgXsF9wuN9hExx0NdhA.webp",
+    "image:license": "CC0",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.7217799,
+     49.7884121
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/14118525502",
+   "properties": {
+    "@id": "node/14118525502",
+    "access": "yes",
+    "check_date": "2026-08-24",
+    "defibrillator:location:de": "An der Hausecke links",
+    "emergency": "defibrillator",
+    "image": "https://openaedmap.org/api/v1/photos/view/LdxaldnVIEqwdsotmwTORw.webp",
+    "image:license": "CC0",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.7477905,
+     49.8174184
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/14118526001",
+   "properties": {
+    "@id": "node/14118526001",
+    "access": "yes",
+    "check_date": "2026-08-24",
+    "defibrillator:location:de": "Links neben dem Tor",
+    "emergency": "defibrillator",
+    "image": "https://openaedmap.org/api/v1/photos/view/QOq26OBwAL_45Bj7MfWbVA.webp",
+    "image:license": "CC0",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.7462051,
+     49.8175495
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/14118526901",
+   "properties": {
+    "@id": "node/14118526901",
+    "access": "private",
+    "check_date": "2026-08-24",
+    "defibrillator:location:de": "An der Kasse",
+    "emergency": "defibrillator",
+    "indoor": "yes",
+    "level": "1"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.749655,
+     49.8161339
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/14125415901",
+   "properties": {
+    "@id": "node/14125415901",
+    "emergency": "defibrillator"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.1306116,
+     50.0821779
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/14135211501",
+   "properties": {
+    "@id": "node/14135211501",
+    "access": "yes",
+    "check_date": "2026-08-30",
+    "defibrillator:location:de": "Zwischen den Fahrzeugtoren",
+    "emergency": "defibrillator",
+    "image": "https://openaedmap.org/api/v1/photos/view/h2OwPzxu9MtpKPVfg8Zb2Q.webp",
+    "image:license": "CC0",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.7641898,
+     49.7250833
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/14135233501",
+   "properties": {
+    "@id": "node/14135233501",
+    "access": "yes",
+    "check_date": "2026-08-30",
+    "defibrillator:location:de": "An der Hauswand",
+    "emergency": "defibrillator",
+    "image": "https://openaedmap.org/api/v1/photos/view/0bNPPEf2jmxTNbfvjC-Nrw.webp",
+    "image:license": "CC0",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.7520271,
+     49.733079
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/14158296902",
+   "properties": {
+    "@id": "node/14158296902",
+    "access": "yes",
+    "check_date": "2026-09-06",
+    "defibrillator:location:de": "Neben dem Eingang",
+    "emergency": "defibrillator",
+    "image": "https://openaedmap.org/api/v1/photos/view/eq952GmvSCqfy6ezF3rN3g.webp",
+    "image:license": "CC0",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.7216304,
+     49.7996677
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/14158296904",
+   "properties": {
+    "@id": "node/14158296904",
+    "access": "yes",
+    "check_date": "2026-09-06",
+    "defibrillator:location:de": "Rechts neben dem Eingang.",
+    "emergency": "defibrillator",
+    "image": "https://openaedmap.org/api/v1/photos/view/8F7nZ76RxVm8GhYCst518w.webp",
+    "image:license": "CC0",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.7778747,
+     49.7753624
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/14183654931",
+   "properties": {
+    "@id": "node/14183654931",
+    "emergency": "defibrillator",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.1182612,
+     50.1452763
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/14200579001",
+   "properties": {
+    "@id": "node/14200579001",
+    "access": "yes",
+    "check_date": "2026-09-20",
+    "defibrillator:location:de": "An der Außenwand, zwischen den Türen",
+    "emergency": "defibrillator",
+    "image": "https://openaedmap.org/api/v1/photos/view/6_NQLHO3fOEKHAzfbVaCYA.webp",
+    "image:license": "CC0",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.6892127,
+     49.6832845
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/14204628504",
+   "properties": {
+    "@id": "node/14204628504",
+    "access": "yes",
+    "check_date": "2026-09-21",
+    "defibrillator:location:de": "In der Gebäudeecke, in der Mitte der Tore",
+    "emergency": "defibrillator",
+    "image": "https://openaedmap.org/api/v1/photos/view/b2z_4nV-g8t84JgR0XLVEw.webp",
+    "image:license": "CC0",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.6614131,
+     49.7443441
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/14232690701",
+   "properties": {
+    "@id": "node/14232690701",
+    "access": "yes",
+    "check_date": "2026-09-29",
+    "defibrillator:location:de": "Links neben den Toren der Feuerwehr",
+    "emergency": "defibrillator",
+    "image": "https://openaedmap.org/api/v1/photos/view/g33_8qABwDzWYdcKqNFc1Q.webp",
+    "image:license": "CC0",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.6933498,
+     49.7809419
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/14247604001",
+   "properties": {
+    "@id": "node/14247604001",
+    "access": "yes",
+    "check_date": "2026-10-04",
+    "defibrillator:location:de": "Neben dem Eingang",
+    "emergency": "defibrillator",
+    "image": "https://openaedmap.org/api/v1/photos/view/gAxvxwsm8A_TAdY3cGYUTg.webp",
+    "image:license": "CC0",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.7704154,
+     49.8093272
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/14247638701",
+   "properties": {
+    "@id": "node/14247638701",
+    "access": "yes",
+    "check_date": "2026-10-04",
+    "defibrillator:location:de": "Neben dem Eingang. Höhe ca. 1,8m.",
+    "emergency": "defibrillator",
+    "image": "https://openaedmap.org/api/v1/photos/view/kvY1gHCgrrPsbtd78ClJOg.webp",
+    "image:license": "CC0",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.8281328,
+     49.7976632
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/14287704601",
+   "properties": {
+    "@id": "node/14287704601",
+    "access": "yes",
+    "check_date": "2026-10-17",
+    "defibrillator:location:de": "Links neben den Fahrzeugtoren",
+    "emergency": "defibrillator",
+    "image": "https://openaedmap.org/api/v1/photos/view/UzPBj5aiY09mdsEsg6B9pg.webp",
+    "image:license": "CC0",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.7169165,
+     49.7752278
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/14336851001",
+   "properties": {
+    "@id": "node/14336851001",
+    "access": "yes",
+    "check_date": "2026-10-31",
+    "defibrillator:location:de": "An der Hauswand",
+    "emergency": "defibrillator",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.708333,
+     49.7865617
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/14341939300",
+   "properties": {
+    "@id": "node/14341939300",
+    "defibrillator:location": "Draußen, rechts vor der Tür",
+    "emergency": "defibrillator",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.6946341,
+     49.7352194
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/14344904601",
+   "properties": {
+    "@id": "node/14344904601",
+    "access": "yes",
+    "check_date": "2026-11-03",
+    "defibrillator:location:de": "Links am Feuerwehrhaus Horath",
+    "emergency": "defibrillator",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.9867549,
+     49.8126139
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "node/14363055475",
+   "properties": {
+    "@id": "node/14363055475",
+    "defibrillator:location": "Draußen, überdacht, rechts am Eingang",
+    "emergency": "defibrillator",
+    "indoor": "no"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.7025071,
+     49.7405262
+    ]
+   }
+  }
+ ]
+}

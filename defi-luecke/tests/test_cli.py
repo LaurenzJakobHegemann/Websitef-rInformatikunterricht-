@@ -1,17 +1,7 @@
 import subprocess
 import sys
 
-import pytest
-
 from pipeline.cli import main
-
-STEP_MILESTONES = {
-    "coverage": "M2",
-    "optimize": "M3",
-    "validate": "M5",
-    "figures": "M5",
-    "export-web": "M4",
-}
 
 
 def test_check_config_exit_zero(capsys):
@@ -20,12 +10,22 @@ def test_check_config_exit_zero(capsys):
     assert "07231" in out
 
 
-@pytest.mark.parametrize(("step", "milestone"), STEP_MILESTONES.items())
-def test_stub_step_fails_with_german_message(step, milestone, capsys):
-    code = main([step, "--region", "bernkastel-wittlich"])
-    assert code != 0
+def test_not_implemented_module_gives_german_message(monkeypatch, capsys):
+    """A module raising NotImplementedError is reported as a German step message (exit 3).
+
+    Uses a patched module so the test does not run real steps or write into data/.
+    """
+    from pipeline import cli
+
+    class _Stub:
+        @staticmethod
+        def run(region_cfg, params):
+            raise NotImplementedError
+
+    monkeypatch.setitem(cli.STEPS, "validate", ("M5", (_Stub,)))
+    assert main(["validate", "--region", "bernkastel-wittlich"]) == 3
     err = capsys.readouterr().err
-    assert f"Schritt '{step}' ist noch nicht implementiert (Meilenstein {milestone})" in err
+    assert "Schritt 'validate' ist noch nicht implementiert (Meilenstein M5)" in err
 
 
 def test_run_stops_at_first_failing_step(monkeypatch, capsys):
