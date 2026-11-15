@@ -73,6 +73,10 @@ optimize:
 validation:
   match_tolerance_m: 50
   confidence_level: 0.95
+  # Surveyed sub-areas: area name -> list of municipality AGS codes (8 digits, as strings).
+  # Survey file validation/surveys/<region>_<area>.csv belongs to <area>. Empty until the
+  # team has surveyed an area, e.g.  musterort: ["07231001"]
+  areas: {}
 
 plausibility:
   max_population_deviation_pct: 3.0  # placeholder ("wenige Prozent")

@@ -10,10 +10,14 @@ import yaml
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_CONFIG_DIR = PROJECT_ROOT / "config"
+RAW_DIR = PROJECT_ROOT / "data" / "raw"
+INTERIM_DIR = PROJECT_ROOT / "data" / "interim"
 
 REQUIRED_PARAM_SECTIONS = (
     "crs",
     "osm",
+    "census",
+    "boundaries",
     "coverage",
     "optimize",
     "validation",
@@ -40,6 +44,8 @@ class RegionConfig:
 class Params:
     crs: dict[str, Any] = field(default_factory=dict)
     osm: dict[str, Any] = field(default_factory=dict)
+    census: dict[str, Any] = field(default_factory=dict)
+    boundaries: dict[str, Any] = field(default_factory=dict)
     coverage: dict[str, Any] = field(default_factory=dict)
     optimize: dict[str, Any] = field(default_factory=dict)
     validation: dict[str, Any] = field(default_factory=dict)
