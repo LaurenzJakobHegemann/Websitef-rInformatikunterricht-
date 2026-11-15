@@ -1,0 +1,5 @@
+region,lat,lon,location_description,access_type,found_on,method,photo_ref,notes
+synthetic,50.0000,7.0000,SYNTHETISCH Rathaus Eingang,24/7,2026-01-01,Begehung,,SYNTHETISCHE TESTDATEN
+synthetic,50.0010,7.0000,SYNTHETISCH Feuerwehr,Öffnungszeiten,2026-01-01,Begehung,,SYNTHETISCHE TESTDATEN
+synthetic,50.0100,7.0000,SYNTHETISCH Supermarkt (nicht in OSM),Öffnungszeiten,2026-01-01,Anruf,,SYNTHETISCHE TESTDATEN
+synthetic,50.0200,7.0000,SYNTHETISCH Firma intern,nicht öffentlich,2026-01-01,Anruf,,SYNTHETISCHE TESTDATEN

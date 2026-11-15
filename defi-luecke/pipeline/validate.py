@@ -67,9 +67,7 @@ def wilson_interval(k: int, n: int, confidence: float = 0.95) -> tuple[float, fl
     return (p, max(0.0, centre - half), min(1.0, centre + half))
 
 
-def chapman_estimate(
-    n1: int, n2: int, m: int, confidence: float = 0.95
-) -> dict[str, float | int]:
+def chapman_estimate(n1: int, n2: int, m: int, confidence: float = 0.95) -> dict[str, float | int]:
     """Chapman estimator for capture-recapture with two independent lists.
 
     N = (n1+1)(n2+1)/(m+1) - 1,
@@ -123,7 +121,11 @@ def match_points(
     dist = np.hypot(a_xy[:, None, 0] - b_xy[None, :, 0], a_xy[:, None, 1] - b_xy[None, :, 1])
     cost = np.where(dist <= tolerance_m, dist, _BIG)
     rows, cols = linear_sum_assignment(cost)
-    return [(int(r), int(c), float(dist[r, c])) for r, c in zip(rows, cols) if cost[r, c] < _BIG]
+    return [
+        (int(r), int(c), float(dist[r, c]))
+        for r, c in zip(rows, cols, strict=True)
+        if cost[r, c] < _BIG
+    ]
 
 
 # ------------------------------------------------------------------ reading
@@ -281,7 +283,7 @@ def validate_area(
         m = len(match_points(s_xy, l2_xy, tolerance_m))
         result["chapman"] = chapman_estimate(len(public), len(l2), m, confidence)
         result["chapman"]["note"] = (
-            "Annahme: zwei unabhängige Listen (Erhebung und Liste 2), gleiche Fangwahrscheinlichkeit"
+            "Annahme: zwei unabhängige Listen (Erhebung, Liste 2), gleiche Fangwahrscheinlichkeit"
         )
     return result, pd.DataFrame(rows)
 
