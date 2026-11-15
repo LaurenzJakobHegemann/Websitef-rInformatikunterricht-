@@ -177,7 +177,15 @@ def optimize_scope(
     cover = build_cover_matrix(cand_xy, demand_xy, radius, detour_factor)
     picks = greedy(cover, weights, k_max)
     return _rank_table(
-        scope_id, radius, scenario, picks, cand_xy, cand_labels, base_covered, scope_pop, transformer
+        scope_id,
+        radius,
+        scenario,
+        picks,
+        cand_xy,
+        cand_labels,
+        base_covered,
+        scope_pop,
+        transformer,
     )
 
 

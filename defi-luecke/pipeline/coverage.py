@@ -150,7 +150,9 @@ def filter_scenario(aeds: pd.DataFrame, scenario: str) -> pd.DataFrame:
             mask = strict
         elif scenario == "night_optimistic":
             outdoor_no_hours = (
-                public & _missing(_column(aeds, "opening_hours")) & (_column(aeds, "indoor") == "no")
+                public
+                & _missing(_column(aeds, "opening_hours"))
+                & (_column(aeds, "indoor") == "no")
             )
             mask = strict | outdoor_no_hours
         else:
@@ -362,5 +364,7 @@ def run(region_cfg: RegionConfig, params: Params) -> None:
         compute_metrics(layers, params, level, distances).to_csv(
             out_dir / f"metrics_{level}.csv", index=False
         )
-    compute_cell_coverage(layers.cells, distances).to_csv(out_dir / "cell_coverage.csv", index=False)
+    compute_cell_coverage(layers.cells, distances).to_csv(
+        out_dir / "cell_coverage.csv", index=False
+    )
     print(f"Abdeckung berechnet: {out_dir}")

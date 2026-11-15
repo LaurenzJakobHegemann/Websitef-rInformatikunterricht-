@@ -3,26 +3,29 @@
 from __future__ import annotations
 
 import argparse
+import logging
 import sys
 from collections.abc import Callable, Sequence
 from dataclasses import asdict
 from types import ModuleType
 
 from pipeline import (
+    build_interim,
     coverage,
     export_web,
-    fetch_boundaries,
-    fetch_osm,
     figures,
-    load_census,
     optimize,
     validate,
 )
 from pipeline.config import ConfigError, Params, RegionConfig, load_config
+from pipeline.download import DownloadError
+from pipeline.fetch_boundaries import BoundaryError
+from pipeline.fetch_osm import OsmUnavailableError
+from pipeline.load_census import CensusError
 
 # CLI step name -> (milestone, modules executed in order)
 STEPS: dict[str, tuple[str, tuple[ModuleType, ...]]] = {
-    "fetch": ("M1", (fetch_osm, fetch_boundaries, load_census)),
+    "fetch": ("M1", (build_interim,)),
     "coverage": ("M2", (coverage,)),
     "optimize": ("M3", (optimize,)),
     "validate": ("M5", (validate,)),
@@ -100,6 +103,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
     try:
         region_cfg, params = load_config(args.region, args.config_dir)
         return COMMANDS[args.command](region_cfg, params)
@@ -109,6 +113,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     except StepNotImplementedError as exc:
         print(f"Fehler: {exc}", file=sys.stderr)
         return 3
+    except OsmUnavailableError as exc:
+        print(f"Fehler: {exc}", file=sys.stderr)
+        return 4
+    except (BoundaryError, CensusError, DownloadError) as exc:
+        print(f"Fehler: {exc}", file=sys.stderr)
+        return 5
 
 
 if __name__ == "__main__":

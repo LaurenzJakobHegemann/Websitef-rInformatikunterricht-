@@ -210,7 +210,11 @@ def _validate_response(data: Any) -> None:
     if not isinstance(data, dict) or "elements" not in data:
         raise ValueError("Antwort enthält kein 'elements'")
     remark = str(data.get("remark", ""))
-    if remark and not data["elements"] and re.search(r"error|timed out|out of memory", remark, re.I):
+    if (
+        remark
+        and not data["elements"]
+        and re.search(r"error|timed out|out of memory", remark, re.I)
+    ):
         raise ValueError(f"Overpass-Hinweis: {remark}")
 
 
@@ -301,9 +305,7 @@ def get_snapshot(
     )
 
 
-def _load(
-    kind: str, chosen: tuple[str, Path], source: str, url: str | None = None
-) -> OsmSnapshot:
+def _load(kind: str, chosen: tuple[str, Path], source: str, url: str | None = None) -> OsmSnapshot:
     date, path = chosen
     data = json.loads(path.read_text(encoding="utf-8"))
     _validate_response(data)
