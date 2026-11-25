@@ -15,3 +15,4 @@ data/processed/*
 !data/processed/.gitkeep
 web/node_modules/
 web/dist/
+web/dist-single/

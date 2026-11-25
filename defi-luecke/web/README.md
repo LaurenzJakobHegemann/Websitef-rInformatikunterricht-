@@ -31,3 +31,17 @@ Dateien: `meta.json`, `metrics.json`, `municipalities.geojson`, `aeds.geojson`,
 
 `dist/` enthält relative Pfade (`base: './'`) und läuft deshalb auch in einem Unterordner
 (z. B. GitHub Pages). Vor dem Build die Daten nach `public/data/` exportieren.
+
+## Weitergeben
+
+### Eine einzelne Datei (ohne Installation)
+
+```bash
+npm run build:single
+```
+
+Erzeugt `dist-single/defi-luecke.html` (rund 3 MB). Darin stecken Code, Stil und alle Daten. Die Datei lässt sich per E-Mail, Messenger oder USB-Stick weitergeben und mit einem Doppelklick im Browser öffnen, auch am Handy. Es wird kein Webserver gebraucht. Nur der Kartenhintergrund kommt aus dem Internet (OpenStreetMap-Kacheln); ohne Verbindung fehlt er, alles andere funktioniert.
+
+### Als Webseite mit eigener Adresse
+
+`npm run build` erzeugt den Ordner `dist/`. Diesen Ordner kann jeder statische Hoster ausliefern, zum Beispiel GitHub Pages, Cloudflare Pages oder Netlify (dort lässt sich der Ordner einfach per Drag-and-drop hochladen). Es gibt kein Backend, keine Datenbank und keine Cookies.

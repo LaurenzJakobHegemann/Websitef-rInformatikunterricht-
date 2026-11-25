@@ -11,7 +11,24 @@ import type {
 
 export class DataError extends Error {}
 
+declare global {
+  interface Window {
+    /** Set only in the single-file build (scripts/build-single.mjs): path below data/ -> JSON. */
+    __DEFI_DATA__?: Record<string, unknown>;
+  }
+}
+
+/** Data embedded in the page (single-file build), or undefined if the page loads files. */
+function embedded(url: string): unknown {
+  const store = window.__DEFI_DATA__;
+  if (!store) return undefined;
+  const rel = url.startsWith(DATA_BASE) ? url.slice(DATA_BASE.length) : url;
+  return store[decodeURIComponent(rel)];
+}
+
 export async function loadJson<T>(url: string): Promise<T> {
+  const inline = embedded(url);
+  if (inline !== undefined) return inline as T;
   let res: Response;
   try {
     res = await fetch(url, { cache: 'no-cache' });
